@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CategoryDTO {
+public class CategoryResult {
     private Long id;
     private String title;
 

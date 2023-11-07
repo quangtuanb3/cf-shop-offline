@@ -1,6 +1,5 @@
-package com.cg.order.dto;
-import com.cg.orderDetail.dto.OrderDetailDTO;
-import com.cg.staff.dto.StaffResult;
+package com.cg.orderDetail.dto;
+
 import com.cg.tableOrder.dto.TableOrderResult;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,17 +8,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Accessors(chain = true)
-public class OrderDTO {
-    private Long id;
-    private StaffResult staff;
-    private TableOrderResult tableOrder;
+public class UpdateOrderDetailParam {
+    private TableOrderResult table;
     private BigDecimal totalAmount;
-    private OrderDetailDTO orderDetailDTO;
-    private Boolean paid;
-
+    private List<OrderDetailProductUpResDTO> products;
 }

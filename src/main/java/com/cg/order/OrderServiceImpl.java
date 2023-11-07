@@ -1,21 +1,26 @@
 package com.cg.order;
 
 import com.cg.exception.ResourceNotFoundException;
-import com.cg.order.dto.OrderCreReqDTO;
+import com.cg.order.dto.CreationOrderParam;
 import com.cg.order.dto.OrderUpChangeToTableReqDTO;
 import com.cg.order.dto.OrderUpChangeToTableResDTO;
 import com.cg.order.dto.OrderUpReqDTO;
 import com.cg.exception.DataInputException;
 import com.cg.model.*;
-import com.cg.orderDetail.dto.OrderDetailCreResDTO;
+import com.cg.orderDetail.OrderDetailMapper;
+import com.cg.orderDetail.dto.CreationOrderDetailParam;
 import com.cg.orderDetail.dto.OrderDetailProductUpResDTO;
-import com.cg.orderDetail.dto.OrderDetailUpResDTO;
+import com.cg.orderDetail.dto.UpdateOrderDetailParam;
 import com.cg.model.enums.ETableStatus;
 import com.cg.orderDetail.OrderDetailRepository;
+import com.cg.product.IProductService;
 import com.cg.product.ProductRepository;
 import com.cg.staff.StaffRepository;
+import com.cg.tableOrder.ITableOrderService;
 import com.cg.tableOrder.TableOrderMapper;
 import com.cg.tableOrder.TableOrderRepository;
+import com.cg.user.UserServiceImpl;
+import com.cg.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +40,12 @@ public class OrderServiceImpl implements IOrderService {
     private final TableOrderRepository tableOrderRepository;
     private final ProductRepository productRepository;
     private final TableOrderMapper tableOrderMapper;
+    private final OrderDetailMapper orderDetailMapper;
+    private final AppUtils appUtils;
+    private final UserServiceImpl userService;
+    private final IProductService productService;
+    private final ITableOrderService tableOrderService;
+    private final IOrderService orderService;
 
     public List<Order> findAll() {
         return orderRepository.findAll();
@@ -56,7 +67,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public OrderDetailCreResDTO creOrder(OrderCreReqDTO orderCreReqDTO, TableOrder tableOrder, User user) {
+    public CreationOrderDetailParam creOrder(CreationOrderParam creationOrderParam, TableOrder tableOrder, User user) {
         Order order = new Order();
         Staff staff = staffRepository.findStaffByUserAndDeletedIsFalse(user);
         order.setStaff(staff);
@@ -68,12 +79,12 @@ public class OrderServiceImpl implements IOrderService {
         tableOrder.setStatus(ETableStatus.BUSY);
         tableOrderRepository.save(tableOrder);
 
-        Product product = productRepository.findById(orderCreReqDTO.getProductId())
+        Product product = productRepository.findById(creationOrderParam.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found!"));
 
         OrderDetail orderDetail = new OrderDetail();
 
-        Long quantity = orderCreReqDTO.getQuantity();
+        Long quantity = creationOrderParam.getQuantity();
         BigDecimal price = product.getPrice();
         BigDecimal amount = price.multiply(BigDecimal.valueOf(quantity));
 
@@ -81,31 +92,39 @@ public class OrderServiceImpl implements IOrderService {
         orderDetail.setQuantity(quantity);
         orderDetail.setPrice(price);
         orderDetail.setAmount(amount);
-        orderDetail.setNote(orderCreReqDTO.getNote());
+        orderDetail.setNote(creationOrderParam.getNote());
         orderDetail.setOrder(order);
 
         orderDetailRepository.save(orderDetail);
 
         order.setTotalAmount(amount);
         orderRepository.save(order);
+        return orderDetailMapper.toDTO(orderDetail,tableOrder,product,order);
 
-        OrderDetailCreResDTO orderDetailCreResDTO = new OrderDetailCreResDTO();
-        orderDetailCreResDTO.setOrderDetailId(orderDetail.getId());
-        orderDetailCreResDTO.setTable(tableOrderMapper.toDTO(tableOrder));
-        orderDetailCreResDTO.setProductId(product.getId());
-        orderDetailCreResDTO.setTitle(product.getTitle());
-        orderDetailCreResDTO.setPrice(price);
-        orderDetailCreResDTO.setQuantity(quantity);
-        orderDetailCreResDTO.setAmount(amount);
-        orderDetailCreResDTO.setNote(orderDetail.getNote());
-        orderDetailCreResDTO.setTotalAmount(amount);
-        orderDetailCreResDTO.setAvatar(product.getProductAvatar().toProductAvatarDTO());
 
-        return orderDetailCreResDTO;
     }
 
     @Override
-    public OrderDetailUpResDTO upOrderDetail(OrderUpReqDTO orderUpReqDTO, Order order, Product product, User user) {
+    public UpdateOrderDetailParam upOrderDetail(OrderUpReqDTO orderUpReqDTO) {
+        String username = appUtils.getPrincipalUsername();
+        User user = userService.findByUsername(username);
+
+
+        TableOrder tableOrder = tableOrderService.findById(orderUpReqDTO.getTableId());
+
+        Product product = productService.findById(orderUpReqDTO.getProductId());
+
+        List<Order> orders = orderService.findByTableOrderAndPaid(tableOrder, false);
+
+        if (orders.size() == 0) {
+            throw new DataInputException("Bàn này không có hoá đơn, vui lòng kiểm tra lại thông tin");
+        }
+
+        if (orders.size() > 1) {
+            throw new DataInputException("Lỗi hệ thống, vui lòng liên hệ ADMIN để kiểm tra lại dữ liệu");
+        }
+
+        Order order = orders.get(0);
         List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrder(order);
         OrderDetail orderDetail = new OrderDetail();
 
@@ -146,18 +165,38 @@ public class OrderServiceImpl implements IOrderService {
         }
 
         List<OrderDetailProductUpResDTO> newOrderDetails = orderDetailRepository.findAllOrderDetailProductUpResDTO(order.getId());
-
-        OrderDetailUpResDTO orderDetailUpResDTO = new OrderDetailUpResDTO();
-        orderDetailUpResDTO.setTable(tableOrderMapper.toDTO(order.getTableOrder()));
-        orderDetailUpResDTO.setProducts(newOrderDetails);
-        orderDetailUpResDTO.setTotalAmount(order.getTotalAmount());
-
-        return orderDetailUpResDTO;
+        return orderDetailMapper.toDTOList(newOrderDetails,order,tableOrderMapper);
 
     }
 
     @Override
-    public OrderUpChangeToTableResDTO changeToTable(OrderUpChangeToTableReqDTO orderUpChangeToTableReqDTO, User user) {
+    public OrderUpChangeToTableResDTO changeToTable(OrderUpChangeToTableReqDTO orderUpChangeToTableReqDTO) {
+        String username = appUtils.getPrincipalUsername();
+//        User user = userService.findByUsername(username);
+
+        TableOrder tableOrderBusy = tableOrderService.findById(orderUpChangeToTableReqDTO
+                .getTableIdBusy());
+        TableOrder tableOrderEmpty = tableOrderService.findById(orderUpChangeToTableReqDTO
+                .getTableIdEmpty());
+
+        if (tableOrderEmpty.getId().equals(tableOrderBusy.getId())) {
+            throw new DataInputException("Bàn chuyển và bàn chuyển là một xin vui lòng kiểm tra lại");
+        }
+
+        List<Order> orderEmptys = orderService.findByTableOrderAndPaid(tableOrderEmpty, false);
+        List<Order> orderBusys = orderService.findByTableOrderAndPaid(tableOrderBusy, false);
+
+        if (orderBusys.size() == 0) {
+            throw new DataInputException("Bàn chuyển này không có hoá đơn, vui lòng kiểm tra lại thông tin");
+        }
+
+        if (orderBusys.size() > 1) {
+            throw new DataInputException("Lỗi hệ thống, vui lòng liên hệ ADMIN để kiểm tra lại dữ liệu");
+        }
+
+        if (orderEmptys.size() != 0) {
+            throw new DataInputException("Bàn nhận này đang có hoá đơn, vui lòng kiểm tra lại thông tin");
+        }
         Order orderBusy = orderRepository.findByTableId(orderUpChangeToTableReqDTO.getTableIdBusy()).get();
 
         TableOrder emptyTable = tableOrderRepository.findById(orderUpChangeToTableReqDTO.getTableIdEmpty()).get();
@@ -173,14 +212,14 @@ public class OrderServiceImpl implements IOrderService {
 
         List<OrderDetailProductUpResDTO> newOrderDetails = orderDetailRepository.findAllOrderDetailProductUpResDTO(orderBusy.getId());
 
-        OrderUpChangeToTableResDTO orderUpChangeToTableResDTO = new OrderUpChangeToTableResDTO();
-        orderUpChangeToTableResDTO.setTableOrder(
-                tableOrderMapper.toDTO(orderBusy.getTableOrder()));
-        orderUpChangeToTableResDTO.setTotalAmount(orderBusy.getTotalAmount());
-        orderUpChangeToTableResDTO.setProducts(newOrderDetails);
-
-
-        return orderUpChangeToTableResDTO;
+//        OrderUpChangeToTableResDTO orderUpChangeToTableResDTO = new OrderUpChangeToTableResDTO();
+//        orderUpChangeToTableResDTO.setTableOrder(tableOrderMapper.toDTO(orderBusy.getTableOrder()));
+//        orderUpChangeToTableResDTO.setTotalAmount(orderBusy.getTotalAmount());
+//        orderUpChangeToTableResDTO.setProducts(newOrderDetails);
+//
+//
+//        return orderUpChangeToTableResDTO;
+        return orderDetailMapper.toDTOUpChang(tableOrderMapper,newOrderDetails,orderBusy);
     }
 
     @Override

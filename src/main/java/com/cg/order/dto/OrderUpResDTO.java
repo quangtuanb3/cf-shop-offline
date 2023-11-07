@@ -1,5 +1,5 @@
 package com.cg.order.dto;
-import com.cg.orderDetail.dto.OrderDetailCreResDTO;
+import com.cg.orderDetail.dto.CreationOrderDetailParam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +18,5 @@ public class OrderUpResDTO {
     private Long tableId;
     private BigDecimal totalAmount;
 
-    private List<OrderDetailCreResDTO> orderDetails;
+    private List<CreationOrderDetailParam> orderDetails;
 }

@@ -1,42 +1,48 @@
 package com.cg.locationRegion;
 
+import com.cg.exception.DataInputException;
+import com.cg.locationRegion.dto.LocationRegionResult;
 import com.cg.model.LocationRegion;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
+
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class LocationRegionServiceImpl implements ILocationRegionService{
 
-    @Autowired
-    private LocationRegionRepository locationRegionRepository;
+
+    private final LocationRegionRepository locationRegionRepository;
+    private final LocationRegionMapper locationRegionMapper;
 
 
     @Override
-    public List<LocationRegion> findAll() {
-        return locationRegionRepository.findAll();
+    @Transactional
+    public List<LocationRegionResult> findAll() {
+        List<LocationRegion> entities = locationRegionRepository.findAll();
+        return locationRegionMapper.toDTOList(entities);
     }
 
     @Override
-    public Optional<LocationRegion> findById(Long id) {
-        return locationRegionRepository.findById(id);
+    @Transactional
+    public LocationRegion findById(Long id) {
+
+        return locationRegionRepository.findById(id).orElseThrow(()->{
+            throw new DataInputException("ma id k ton tai");
+        });
     }
 
     @Override
-    public LocationRegion save(LocationRegion locationRegion) {
-        return locationRegionRepository.save(locationRegion);
-    }
-
-    @Override
-    public void delete(LocationRegion locationRegion) {
+    @Transactional
+    public LocationRegionResult save(LocationRegion locationRegion) {
+        LocationRegion entity = locationRegionRepository.save(locationRegion);
+        return locationRegionMapper.toDTO(entity);
 
     }
 
-    @Override
-    public void deleteById(Long id) {
 
-    }
+
+
 }

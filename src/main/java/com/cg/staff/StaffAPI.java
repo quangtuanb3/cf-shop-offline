@@ -8,7 +8,7 @@ import com.cg.model.Role;
 import com.cg.model.Staff;
 import com.cg.model.User;
 import com.cg.role.IRoleService;
-import com.cg.locationRegion.dto.LocationRegionUpReqDTO;
+import com.cg.locationRegion.dto.UpdateLocationRegionParam;
 import com.cg.staff.dto.CreationStaffParam;
 import com.cg.staff.dto.StaffResult;
 import com.cg.staff.dto.UpdateStaffParam;
@@ -24,7 +24,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/staffs")
@@ -91,8 +90,8 @@ public class StaffAPI {
         if (updateStaffParam.getStaffAvatar() == null) {
             Staff updateStaff = updateStaffParam.toStaffUpReqDTO(staffId);
             Long locationRegionId = staff.getLocationRegion().getId();
-            LocationRegionUpReqDTO locationRegionUpReqDTO = updateStaffParam.getLocationRegion();
-            LocationRegion locationRegion = locationRegionUpReqDTO.toLocationRegionUp(locationRegionId);
+            UpdateLocationRegionParam updateLocationRegionParam = updateStaffParam.getLocationRegion();
+            LocationRegion locationRegion = updateLocationRegionParam.toLocationRegionUp(locationRegionId);
             locationRegionService.save(locationRegion);
 
             updateStaff.setStaffAvatar(staff.getStaffAvatar());

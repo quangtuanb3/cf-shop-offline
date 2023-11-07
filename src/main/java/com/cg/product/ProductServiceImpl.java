@@ -1,5 +1,6 @@
 package com.cg.product;
 
+import com.cg.category.CategoryRepository;
 import com.cg.exception.DataInputException;
 import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.Category;
@@ -21,23 +22,24 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    private ProductAvatarRepository productAvatarRepository;
+    private final ProductAvatarRepository productAvatarRepository;
 
-    private IUploadService uploadService;
+    private final IUploadService uploadService;
 
-    private UploadUtils uploadUtils;
+    private final UploadUtils uploadUtils;
 
-    private ValidateUtils validateUtils;
+    private final ValidateUtils validateUtils;
+    private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
+
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -49,20 +51,18 @@ public class ProductServiceImpl implements IProductService {
     }
 
 
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
-
-    public void delete(Product product) {
-
-    }
-
-    public void deleteById(Long id) {
-
-    }
 
     @Override
-    public ProductResult createProduct(CreationProductParam creationProductParam, Category category) {
+    public ProductResult createProduct(CreationProductParam creationProductParam) {
+        if (!validateUtils.isNumberValid(creationProductParam.getCategoryId())) {
+            throw new DataInputException("Mã danh mục không hợp lệ");
+        }
+
+        Long idCategory = Long.parseLong(creationProductParam.getCategoryId());
+        Category category = categoryRepository.findByIdAndDeletedFalse(idCategory)
+                .orElseThrow(() -> {
+                    throw new DataInputException("Mã danh mục không tồn tại");
+                });
         ProductAvatar productAvatar = new ProductAvatar();
         productAvatarRepository.save(productAvatar);
 
@@ -73,26 +73,54 @@ public class ProductServiceImpl implements IProductService {
         product.setProductAvatar(productAvatar);
         productRepository.save(product);
 
-        return new ProductResult().toDTO(product);
+        return  productMapper.toDTO(product);
     }
 
     @Override
     public List<ProductResult> findAllProductDTO() {
-        return productRepository.findAllByDeletedIsFalse().stream().map(Product::toDTO).collect(Collectors.toList());
+        List<Product> entities = productRepository.findAllByDeletedIsFalse();
+        return productMapper.toDTOList(entities);
     }
 
     @Override
-    public ProductResult update(Long id, UpdateProductParam updateProductParam, Category category) {
+    public ProductResult update(String productIdStr, UpdateProductParam updateProductParam) {
+        if (!validateUtils.isNumberValid(productIdStr)) {
+            throw new DataInputException("Mã sản phẩm không hợp lệ");
+        }
+
+        Long productId = Long.parseLong(productIdStr);
+        Product productDB = productRepository.findByIdAndDeletedFalse(productId).orElseThrow(()->{
+        throw new DataInputException("ma san pham k ton tai");
+    });
+
+
+
+
+        if (!validateUtils.isNumberValid(updateProductParam.getCategoryId())) {
+            throw new DataInputException("Mã danh mục không hợp lệ");
+        }
+
+        Long idCategory = Long.parseLong(updateProductParam.getCategoryId());
+        Category category = categoryRepository.findByIdAndDeletedFalse(idCategory)
+                .orElseThrow(()-> new ResourceNotFoundException("Not found"));
+
+        if (updateProductParam.getAvatar() == null) {
+            Product product = updateProductParam.toProductChangeImage(category);
+            product.setId(productDB.getId());
+            product.setProductAvatar(productDB.getProductAvatar());
+            productRepository.save(product);
+
+        }
         ProductAvatar productAvatar = new ProductAvatar();
         productAvatarRepository.save(productAvatar);
 
         uploadAndSaveProductImage(updateProductParam.toDTO(), productAvatar);
 
         Product productUpdate = updateProductParam.toProductChangeImage(category);
-        productUpdate.setId(id);
+        productUpdate.setId(productId);
         productUpdate.setProductAvatar(productAvatar);
         productRepository.save(productUpdate);
-        return new ProductResult().toDTO(productUpdate);
+        return productMapper.toDTO(productUpdate);
     }
 
     @Override
@@ -122,8 +150,18 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product findByIdAndDeletedFalse(Long id) {
-        return productRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Not found!"));
+    public Product save(Product product) {
+        return null;
+    }
+
+    @Override
+    public ProductResult findByIdAndDeletedFalse(String productIdStr) {
+        if (!validateUtils.isNumberValid(productIdStr)) {
+            throw new DataInputException("Mã sản phẩm không hợp lệ");
+        }
+        Long productId = Long.valueOf(productIdStr);
+        Product entity = productRepository.findByIdAndDeletedFalse(productId).orElseThrow(() -> new ResourceNotFoundException("Not found!"));
+        return productMapper.toDTO(entity);
     }
 
     private void uploadAndSaveProductImage(CreationProductParam creationProductParam, ProductAvatar productAvatar) {

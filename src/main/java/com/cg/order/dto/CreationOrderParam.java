@@ -1,4 +1,4 @@
-package com.cg.locationRegion.dto;
+package com.cg.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,9 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LocationRegionCreResDTO {
-    private String provinceName;
-
-    private String districtName;
-
-    private String wardName;
-
-    private String address;
+public class CreationOrderParam {
+    private Long tableId;
+    private Long quantity;
+    private Long productId;
+    private String note;
 }

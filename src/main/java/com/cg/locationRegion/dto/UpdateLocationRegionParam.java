@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LocationRegionUpReqDTO {
+public class UpdateLocationRegionParam {
     private String provinceId;
     private String provinceName;
     private String districtId;

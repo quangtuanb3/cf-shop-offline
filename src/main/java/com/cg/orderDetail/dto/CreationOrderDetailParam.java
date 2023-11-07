@@ -1,4 +1,5 @@
 package com.cg.orderDetail.dto;
+import com.cg.model.TableOrder;
 import com.cg.productAvatar.dto.ProductAvatarResult;
 import com.cg.tableOrder.dto.TableOrderResult;
 import lombok.AllArgsConstructor;
@@ -10,14 +11,13 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Getter
 @Setter
 @Accessors(chain = true)
-public class OrderDetailCreResDTO {
+public class CreationOrderDetailParam {
     private Long orderDetailId;
-    private TableOrderResult table;
+    private TableOrder table;
     private Long productId;
     private String title;
     private BigDecimal price;

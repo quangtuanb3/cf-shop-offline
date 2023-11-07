@@ -9,7 +9,7 @@ import java.util.Optional;
 
 
 public interface IOrderDetailService extends IGeneralService<OrderDetail,Long> {
-    List<OrderDetailByTableResDTO> getOrderDetailByTableResDTO(Long orderId);
+    List<OrderDetailByTableResDTO> getOrderDetailByTableResDTO(String orderId);
 
     Optional<OrderDetail> findByOrderDetailByIdProductAndIdOrder(Long idProduct, Long idOrder, String note);
 

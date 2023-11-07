@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdAndDeletedFalse(Long id);
     List<Product> findAllByDeletedIsFalse();
 
-    @Query("SELECT NEW com.cg.product.DTO.ProductDTO (" +
+    @Query("SELECT NEW com.cg.product.dto.ProductDTO (" +
             "pr.id, " +
             "pr.title, " +
             "pr.price, " +

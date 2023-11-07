@@ -6,7 +6,7 @@ import com.cg.exception.EmailExistsException;
 
 import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.*;
-import com.cg.locationRegion.dto.LocationRegionUpReqDTO;
+import com.cg.locationRegion.dto.UpdateLocationRegionParam;
 import com.cg.staff.dto.CreationStaffParam;
 import com.cg.staff.dto.StaffResult;
 import com.cg.staff.dto.UpdateStaffParam;
@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -175,8 +174,8 @@ public class StaffServiceImpl implements IStaffService {
         MultipartFile file = updateStaffParam.getStaffAvatar();
         Staff staff = staffService.findById(staffId);
         Long locationRegionId = staff.getLocationRegion().getId();
-        LocationRegionUpReqDTO locationRegionUpReqDTO = updateStaffParam.getLocationRegion();
-        LocationRegion locationRegion = locationRegionUpReqDTO.toLocationRegionUp(locationRegionId);
+        UpdateLocationRegionParam updateLocationRegionParam = updateStaffParam.getLocationRegion();
+        LocationRegion locationRegion = updateLocationRegionParam.toLocationRegionUp(locationRegionId);
         locationRegionRepository.save(locationRegion);
 
         StaffAvatar staffAvatar = new StaffAvatar();

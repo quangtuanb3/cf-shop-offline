@@ -1,10 +1,13 @@
 package com.cg.orderDetail;
 
+import com.cg.exception.DataInputException;
 import com.cg.model.Order;
 import com.cg.model.OrderDetail;
 import com.cg.orderDetail.dto.OrderDetailByTableResDTO;
 import com.cg.order.OrderRepository;
 import com.cg.order.IOrderService;
+import com.cg.utils.ValidateUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +19,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class OrderDetailServiceImpl implements IOrderDetailService{
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
-    @Autowired
-    private IOrderService orderService;
+
+    private final OrderRepository orderRepository;
+
+
+    private final IOrderService orderService;
+    private final ValidateUtils validateUtils;
     @Override
     public List<OrderDetail> findAll() {
         return orderDetailRepository.findAll();
@@ -39,8 +43,15 @@ public class OrderDetailServiceImpl implements IOrderDetailService{
 
 
     @Override
-    public List<OrderDetailByTableResDTO> getOrderDetailByTableResDTO(Long orderId) {
-        return orderDetailRepository.getOrderDetailByTableResDTO(orderId);
+    public List<OrderDetailByTableResDTO> getOrderDetailByTableResDTO(String tableIdStr) {
+        if (!validateUtils.isNumberValid(tableIdStr)) {
+            throw new DataInputException("Mã số bàn không hợp lệ vui lòng xem lại");
+        }
+
+        Long tableId = Long.valueOf(tableIdStr);
+
+        Order order = orderService.findByTableId(tableId);
+        return orderDetailRepository.getOrderDetailByTableResDTO(order.getId());
     }
 
     @Override

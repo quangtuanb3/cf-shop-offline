@@ -1,18 +1,16 @@
 package com.cg.order;
 
 
-import com.cg.order.dto.OrderCreReqDTO;
+import com.cg.order.dto.CreationOrderParam;
 import com.cg.order.dto.OrderUpChangeToTableReqDTO;
 import com.cg.order.dto.OrderUpChangeToTableResDTO;
 import com.cg.order.dto.OrderUpReqDTO;
 import com.cg.model.*;
-import com.cg.orderDetail.dto.OrderDetailCreResDTO;
-import com.cg.orderDetail.dto.OrderDetailUpResDTO;
-import com.cg.service.IGeneralService;
+import com.cg.orderDetail.dto.CreationOrderDetailParam;
+import com.cg.orderDetail.dto.UpdateOrderDetailParam;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 public interface IOrderService  {
     Order findByTableId(Long tableId);
@@ -20,11 +18,11 @@ public interface IOrderService  {
     List<Order> findByTableOrderAndPaid(TableOrder tableOrder, Boolean paid);
 
 
-    OrderDetailCreResDTO creOrder(OrderCreReqDTO orderCreReqDTO, TableOrder tableOrder, User user);
+    CreationOrderDetailParam creOrder(CreationOrderParam creationOrderParam, TableOrder tableOrder, User user);
 
-    OrderDetailUpResDTO upOrderDetail(OrderUpReqDTO orderUpReqDTO, Order order, Product product, User user);
+    UpdateOrderDetailParam upOrderDetail(OrderUpReqDTO orderUpReqDTO);
 
-    OrderUpChangeToTableResDTO changeToTable(OrderUpChangeToTableReqDTO orderUpChangeToTableReqDTO, User user);
+    OrderUpChangeToTableResDTO changeToTable(OrderUpChangeToTableReqDTO orderUpChangeToTableReqDTO);
 
     Order save(Order order);
 

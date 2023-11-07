@@ -14,7 +14,7 @@ import org.springframework.validation.Validator;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CategoryCreReqDTO implements Validator {
+public class CreationCategoryParam implements Validator {
 
     private String title;
 
@@ -27,14 +27,14 @@ public class CategoryCreReqDTO implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return CategoryCreReqDTO.class.isAssignableFrom(clazz);
+        return CreationCategoryParam.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        CategoryCreReqDTO categoryCreReqDTO = (CategoryCreReqDTO) target;
+        CreationCategoryParam creationCategoryParam = (CreationCategoryParam) target;
 
-        String title = categoryCreReqDTO.title;
+        String title = creationCategoryParam.title;
 
         if (title.isEmpty()) {
             errors.rejectValue("title","title.null","Tên không được phép rỗng");

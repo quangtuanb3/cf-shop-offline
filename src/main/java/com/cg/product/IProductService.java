@@ -1,25 +1,22 @@
 package com.cg.product;
 
-import com.cg.model.Category;
 import com.cg.model.Product;
 import com.cg.product.dto.CreationProductParam;
 import com.cg.product.dto.ProductResult;
 import com.cg.product.dto.UpdateProductParam;
-import com.cg.service.IGeneralService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IProductService {
-    ProductResult createProduct(CreationProductParam creationProductParam, Category category);
+    ProductResult createProduct(CreationProductParam creationProductParam);
 
     List<ProductResult> findAllProductDTO();
 
     Product findById(Long id);
 
-    ProductResult update(Long productId, UpdateProductParam updateProductParam, Category category);
+    ProductResult update(String productId, UpdateProductParam updateProductParam);
 
     void deleteByIdTrue(Product product);
 
@@ -31,7 +28,7 @@ public interface IProductService {
 
     Page<ProductResult> findAllProductDTOPage(Pageable pageable);
 
-    Product findByIdAndDeletedFalse(Long id);
-
     Product save(Product product);
+
+    ProductResult findByIdAndDeletedFalse(String productIdStr);
 }

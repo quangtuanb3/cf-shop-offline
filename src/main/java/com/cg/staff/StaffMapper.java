@@ -1,20 +1,14 @@
 package com.cg.staff;
 
-import com.cg.locationRegion.dto.LocationRegionResDTO;
-import com.cg.locationRegion.dto.LocationRegionUpReqDTO;
 import com.cg.model.*;
 import com.cg.staff.dto.CreationStaffParam;
 import com.cg.staff.dto.StaffResult;
 import com.cg.staff.dto.UpdateStaffParam;
 import com.cg.staffAvatar.StaffAvatarMapper;
-import com.cg.staffAvatar.dto.StaffAvatarResult;
 import com.cg.user.UserMapper;
-import com.cg.user.dto.UserParam;
-import com.cg.user.dto.UserResult;
 import com.cg.utils.UploadUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;

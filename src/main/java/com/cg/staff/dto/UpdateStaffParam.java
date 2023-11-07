@@ -1,7 +1,7 @@
 package com.cg.staff.dto;
 
 import com.cg.model.Staff;
-import com.cg.locationRegion.dto.LocationRegionUpReqDTO;
+import com.cg.locationRegion.dto.UpdateLocationRegionParam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UpdateStaffParam implements Validator{
     private String title;
     private String phone;
-    private LocationRegionUpReqDTO locationRegion;
+    private UpdateLocationRegionParam locationRegion;
     private MultipartFile staffAvatar;
 
     @Override

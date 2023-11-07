@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class OrderDetailDTO {
+public class OrderDetailResult {
     private Long orderDetailId;
     private ProductResult product;
     private String quantity;

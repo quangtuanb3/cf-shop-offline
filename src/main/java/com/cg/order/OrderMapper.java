@@ -2,10 +2,10 @@ package com.cg.order;
 
 import com.cg.model.Order;
 import com.cg.order.dto.OrderCreResDTO;
-import com.cg.order.dto.OrderDTO;
+import com.cg.order.dto.OrderResult;
 import com.cg.order.dto.OrderResDTO;
 import com.cg.order.dto.OrderUpResDTO;
-import com.cg.orderDetail.dto.OrderDetailDTO;
+import com.cg.orderDetail.dto.OrderDetailResult;
 import com.cg.staff.StaffMapper;
 import com.cg.tableOrder.TableOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +21,22 @@ public class OrderMapper {
     private final TableOrderMapper tableOrderMapper;
 
     public OrderResDTO toOrderResDTO(Order entity) {
-        List<OrderDetailDTO> orderDetailDTOS = new ArrayList<>();
+        List<OrderDetailResult> orderDetailResults = new ArrayList<>();
         for (int i = 0; i < entity.getOrderDetails().size(); i++) {
-            OrderDetailDTO orderDetailDTO = entity.getOrderDetails().get(i).toOrderDetailDTO();
-            orderDetailDTOS.add(orderDetailDTO);
+            OrderDetailResult orderDetailResult = entity.getOrderDetails().get(i).toOrderDetailDTO();
+            orderDetailResults.add(orderDetailResult);
         }
         return new OrderResDTO()
                 .setId(entity.getId())
                 .setStaff(staffMapper.toDTO(entity.getStaff()))
                 .setTableOrder(tableOrderMapper.toDTO(entity.getTableOrder()))
-                .setOrderDetails(orderDetailDTOS)
+                .setOrderDetails(orderDetailResults)
                 .setPaid(entity.getPaid())
                 ;
     }
 
-    public OrderDTO toOrderDTO(Order entity) {
-        return new OrderDTO()
+    public OrderResult toOrderDTO(Order entity) {
+        return new OrderResult()
                 .setId(entity.getId())
                 .setTotalAmount(entity.getTotalAmount())
                 ;

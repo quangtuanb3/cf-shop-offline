@@ -36,83 +36,70 @@ public class ProductAPI {
 
     @GetMapping("/{productId}")
     public ResponseEntity<?> findByIdProduct(@PathVariable("productId") String productIdStr) {
-
-        if (!validateUtils.isNumberValid(productIdStr)) {
-            throw new DataInputException("Mã sản phẩm không hợp lệ");
-        }
-        Long productId = Long.valueOf(productIdStr);
-
-        Product product = productService.findByIdAndDeletedFalse(productId);
-
-        return new ResponseEntity<>(product.toProductDTO(), HttpStatus.OK);
+        return new ResponseEntity<>(productService.findByIdAndDeletedFalse(productIdStr), HttpStatus.OK);
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@ModelAttribute CreationProductParam creationProductParam, BindingResult bindingResult) {
 
-        if (!validateUtils.isNumberValid(creationProductParam.getCategoryId())) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
 
-        Long idCategory = Long.parseLong(creationProductParam.getCategoryId());
-        Category category = categoryService.findByIdAndDeletedFalse(idCategory)
-                .orElseThrow(() -> {
-            throw new DataInputException("Mã danh mục không tồn tại");
-        });
 
         new CreationProductParam().validate(creationProductParam, bindingResult);
         if (bindingResult.hasFieldErrors()) {
             return appUtils.mapErrorToResponse(bindingResult);
         }
-        return new ResponseEntity<>(productService.createProduct(creationProductParam, category), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.createProduct(creationProductParam), HttpStatus.CREATED);
     }
 
     @PatchMapping("/edit/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable("productId") String productIdStr, @ModelAttribute UpdateProductParam updateProductParam, BindingResult bindingResult) {
 
-        if (!validateUtils.isNumberValid(productIdStr)) {
-            throw new DataInputException("Mã sản phẩm không hợp lệ");
-        }
-
-        Long productId = Long.parseLong(productIdStr);
-        Product productDB = productService.findByIdAndDeletedFalse(productId);
-
-
+//        if (!validateUtils.isNumberValid(productIdStr)) {
+//            throw new DataInputException("Mã sản phẩm không hợp lệ");
+//        }
+//
+//        Long productId = Long.parseLong(productIdStr);
+//        Product productDB = productService.findByIdAndDeletedFalse(productId);
+//
+//
         new UpdateProductParam().validate(updateProductParam, bindingResult);
         if (bindingResult.hasFieldErrors()) {
             return appUtils.mapErrorToResponse(bindingResult);
         }
-
-        if (!validateUtils.isNumberValid(updateProductParam.getCategoryId())) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
-
-        Long idCategory = Long.parseLong(updateProductParam.getCategoryId());
-        Category category = categoryService.findByIdAndDeletedFalse(idCategory)
-                .orElseThrow(()-> new ResourceNotFoundException("Not found"));
-
-        if (updateProductParam.getAvatar() == null) {
-            Product product = updateProductParam.toProductChangeImage(category);
-            product.setId(productDB.getId());
-            product.setProductAvatar(productDB.getProductAvatar());
-            return new ResponseEntity<>(productService.save(product), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(productService.update(productId, updateProductParam, category), HttpStatus.OK);
-        }
+//
+//        if (!validateUtils.isNumberValid(updateProductParam.getCategoryId())) {
+//            throw new DataInputException("Mã danh mục không hợp lệ");
+//        }
+//
+//        Long idCategory = Long.parseLong(updateProductParam.getCategoryId());
+//        Category category = categoryService.findByIdAndDeletedFalse(idCategory)
+//                .orElseThrow(()-> new ResourceNotFoundException("Not found"));
+//
+//        if (updateProductParam.getAvatar() == null) {
+//            Product product = updateProductParam.toProductChangeImage(category);
+//            product.setId(productDB.getId());
+//            product.setProductAvatar(productDB.getProductAvatar());
+//            return new ResponseEntity<>(productService.save(product), HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(productService.update(productId, updateProductParam, category), HttpStatus.OK);
+//        }
+        ProductResult dto = productService.update(productIdStr,updateProductParam);
+        return new ResponseEntity<>(dto,HttpStatus.OK);
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable("productId") String productIdStr) {
-        if (!validateUtils.isNumberValid(productIdStr)) {
-            throw new DataInputException("Mã sản phẩm không hợp lệ");
-        }
-        Long productId = Long.parseLong(productIdStr);
-
-        Product product = productService.findByIdAndDeletedFalse(productId);
-
-        productService.deleteByIdTrue(product);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+//        if (!validateUtils.isNumberValid(productIdStr)) {
+//            throw new DataInputException("Mã sản phẩm không hợp lệ");
+//        }
+//        Long productId = Long.parseLong(productIdStr);
+//
+//        Product product = productService.findByIdAndDeletedFalse(productId);
+//
+//        productService.deleteByIdTrue(product);
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+        return null;
     }
 
     @GetMapping("/search/{categoryId}")
@@ -145,20 +132,21 @@ public class ProductAPI {
 
     @GetMapping("{/categoryId}/{keySearch}")
     public ResponseEntity<List<ProductResult>> searchProductCategory(@PathVariable("keySearch") String keySearch, @PathVariable("categoryId") String categoryIdStr) {
-        if (!validateUtils.isNumberValid(categoryIdStr)) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
-        Long categoryId = Long.parseLong(categoryIdStr);
-        categoryService.findByIdAndDeletedFalse(categoryId)
-                .orElseThrow(() -> new DataInputException("Mã danh mục không tồn tại"));
-        keySearch = '%' + keySearch + '%';
-
-        List<ProductResult> productResult = productService.findAllByCategoryLikeAndAndTitleLike(categoryId, keySearch);
-        if (productResult.isEmpty()) {
-            throw new DataInputException("Sản phẩm này không tồn tại");
-        }
-
-        return new ResponseEntity<>(productResult, HttpStatus.OK);
+//        if (!validateUtils.isNumberValid(categoryIdStr)) {
+//            throw new DataInputException("Mã danh mục không hợp lệ");
+//        }
+//        Long categoryId = Long.parseLong(categoryIdStr);
+//        categoryService.findByIdAndDeletedFalse(categoryId)
+//                .orElseThrow(() -> new DataInputException("Mã danh mục không tồn tại"));
+//        keySearch = '%' + keySearch + '%';
+//
+//        List<ProductResult> productResult = productService.findAllByCategoryLikeAndAndTitleLike(categoryId, keySearch);
+//        if (productResult.isEmpty()) {
+//            throw new DataInputException("Sản phẩm này không tồn tại");
+//        }
+//
+//        return new ResponseEntity<>(productResult, HttpStatus.OK);
+        return null;
     }
 
     @GetMapping("/page")

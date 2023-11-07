@@ -14,19 +14,19 @@ import org.springframework.validation.Validator;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CategoryUpReqDTO implements Validator {
+public class UpdateCategoryParam implements Validator {
 
     private String title;
 
     @Override
     public boolean supports(Class<?> clazz) {
-           return CategoryUpReqDTO.class.isAssignableFrom(clazz);
+           return UpdateCategoryParam.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        CategoryUpReqDTO categoryUpReqDTO = (CategoryUpReqDTO) target;
-        String title = categoryUpReqDTO.title;
+        UpdateCategoryParam updateCategoryParam = (UpdateCategoryParam) target;
+        String title = updateCategoryParam.title;
         if (title.isEmpty()) {
             errors.rejectValue("title", "title.null", "Tên không được phép rỗng");
         }

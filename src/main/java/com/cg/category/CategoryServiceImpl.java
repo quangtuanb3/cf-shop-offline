@@ -2,54 +2,74 @@ package com.cg.category;
 
 
 import com.cg.category.dto.*;
+import com.cg.exception.DataInputException;
 import com.cg.model.Category;
+import com.cg.utils.ValidateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements ICategoryService {
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
-
+    private final ValidateUtils validateUtils;
 
     @Override
-    public CategoryCreResDTO createCategory(CategoryCreReqDTO categoryCreReqDTO) {
+    @Transactional
+    public CategoryResult createCategory(CreationCategoryParam creationCategoryParam) {
 
-        Category category = categoryMapper.toEntity(categoryCreReqDTO);
+        Category category = categoryMapper.toEntity(creationCategoryParam);
         categoryRepository.save(category);
-01
+
         return categoryMapper.toDTO(category);
     }
 
     @Override
-    public List<CategoryDTO> findAllCategoryDTO() {
-        return categoryRepository.findAll().stream().map(category -> new Category().toDTO(category.getId(), category.getTitle())).collect(Collectors.toList());
-    }
+    @Transactional
+    public CategoryResult updateCategory(String categoryStrId, UpdateCategoryParam updateCategoryParam) {
+        if (!validateUtils.isNumberValid(categoryStrId)){
+            throw new DataInputException("Mã không hợp lệ");
+        }
 
-    @Override
-    public CategoryDTO updateCategory(Long categoryId, CategoryUpReqDTO categoryUpReqDTO) {
-        Category category = categoryUpReqDTO.toCategoryUpreqDTO(categoryId);
+        Long idCategory =Long.parseLong(categoryStrId);
+        categoryRepository.findByIdAndDeletedFalse(idCategory).orElseThrow(() ->{
+            throw new DataInputException("Mã không tồn tại");
+        });
+        Category category = updateCategoryParam.toCategoryUpreqDTO(idCategory);
         categoryRepository.save(category);
-        return new Category().toDTO(categoryId, categoryUpReqDTO.getTitle());
+        return categoryMapper.toDTO(category);
     }
 
 
     @Override
-    public void deleteByIdTrue(Category category) {
-        category.setDeleted(true);
-        categoryRepository.save(category);
+    @Transactional
+    public void deleteByIdTrue(String strID) {
+        if (!validateUtils.isNumberValid(strID)) {
+            throw new DataInputException("Mã không hợp lệ");
+        }
+        Long categoryId = Long.parseLong(strID);
+        Category entity = categoryRepository.findByIdAndDeletedFalse(categoryId).orElseThrow(() -> {
+            throw new DataInputException("Mã không tồn tại ");
+        });
+        entity.setDeleted(true);
+        categoryRepository.save(entity);
     }
 
     @Override
-    public Optional<Category> findByIdAndDeletedFalse(Long id) {
-        return categoryRepository.findByIdAndDeletedFalse(id);
+    @Transactional
+    public CategoryResult findByIdAndDeletedFalse(String categoryIdStr) {
+        if (!validateUtils.isNumberValid(categoryIdStr)) {
+            throw new DataInputException("Mã danh mục không hợp lệ");
+        }
+        Long categoryId = Long.parseLong(categoryIdStr);
+        Category entity = categoryRepository.findByIdAndDeletedFalse(categoryId).orElseThrow(()->{
+            throw new DataInputException("Mã danh mục không tồn tại");
+        });
+        return categoryMapper.toDTO(entity);
     }
 
     public boolean existById(Long id) {
@@ -58,27 +78,11 @@ public class CategoryServiceImpl implements ICategoryService {
 
 
     @Override
-    public List<Category> findAll() {
-        return null;
+    @Transactional
+    public List<CategoryResult> findAll() {
+        List<Category>  entities = categoryRepository.findAll();
+        return categoryMapper.toDTOList(entities);
     }
 
-    @Override
-    public Optional<Category> findById(Long id) {
-        return Optional.empty();
-    }
 
-    @Override
-    public Category save(Category category) {
-        return null;
-    }
-
-    @Override
-    public void delete(Category category) {
-
-    }
-
-    @Override
-    public void deleteById(Long id) {
-
-    }
 }

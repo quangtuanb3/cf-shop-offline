@@ -1,11 +1,8 @@
 package com.cg.staff.dto;
 
-import com.cg.locationRegion.dto.LocationRegionResDTO;
 import com.cg.model.LocationRegion;
 import com.cg.model.StaffAvatar;
 import com.cg.model.User;
-import com.cg.staffAvatar.dto.StaffAvatarResult;
-import com.cg.user.dto.UserResult;
 import lombok.*;
 import lombok.experimental.Accessors;
 
