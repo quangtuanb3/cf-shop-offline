@@ -1,0 +1,55 @@
+<th:block th:fragment="modalPayment">
+    <div class="modal fade" id="modalPayment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 id="tableId" class="modal-title fs-5"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-area hide"></div>
+                    <form method="post" id="frmPayment" class="d-flex justify-content-around">
+                        <table class="table table-striped table-hover w-100 " id="tbOrderItems">
+                            <thead>
+
+                            <tr>
+                                <th class="text-center">Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-center">Giá</th>
+                                <th class="text-center">Thành tiền</th>
+
+                            </tr>
+
+
+                            </thead>
+                            <tbody>
+
+
+                            </tbody>
+                            <tfoot>
+                                <tr id="totalAmountModal">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+
+                        </table>
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnPaymentOrder">
+                        <i class="fa-regular fa-money-bill-1"></i>
+                        Thanh Toán
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</th:block>

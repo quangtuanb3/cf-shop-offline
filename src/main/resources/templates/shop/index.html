@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/assets/bootstrap/v.5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/iziToast/iziToast-1.4.0.min.css">
+    <link rel="stylesheet" href="/assets/fontawesome/v-5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+<div class="container-fluid">
+    <div style="position: absolute;right: 20px;top: 10px; " >
+        <ul class="list-unstyled topnav-menu float-right mb-0">
+            <li class="dropdown notification-list">
+                <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown"
+                   href="/logout" role="button" aria-haspopup="false" aria-expanded="false">
+                    <span class="pro-user-name ml-1" th:text="${userName}">
+                                <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
+                    <!-- item-->
+                    <div class="dropdown-header noti-title">
+                        <h6 class="text-overflow m-0">Welcome !</h6>
+                    </div>
+
+                    <!-- item-->
+                    <a href="/shop/my-account" class="dropdown-item notify-item">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <span>My Account</span>
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <!-- item-->
+                    <a href="/logout" class="dropdown-item notify-item logout-user">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+    <div class="col-md-7">
+        <div class="container-left">
+            <div class="header">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item col-3" role="presentation">
+                        <button class="nav-link active col-12" id="table-tab" data-bs-toggle="tab"
+                                data-bs-target="#table-pannel"
+                                type="button" role="tab" aria-controls="table-pannel" aria-selected="true"><i
+                                class="fas fa-tablets" style="margin-right: 5px"></i>Bàn
+                        </button>
+                    </li>
+                    <li class="nav-item col-3" role="presentation">
+                        <button class="nav-link col-12" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu-pannel"
+                                type="button" role="tab" aria-controls="menu-pannel" aria-selected="false"><i
+                                class="fas fa-book-open" style="margin-right: 5px;"></i>Menu
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="container-content" id="container-content-left">
+                <div id="div-search-product" class="search d-flex justify-content-end hide">
+                    <input type="text" id="searchProduct" placeholder="Search here ....">
+                </div>
+
+                <div class="content">
+                    <div class="tab-content" id="tabContent">
+                        <div class="tab-pane fade show active" id="table-pannel" role="tabpanel"
+                             aria-labelledby="table-tab"
+                             tabindex="0">
+
+                        </div>
+                        <div>
+
+                            <div class="tab-pane fade hide" id="menu-pannel" role="tabpanel" aria-labelledby="menu-tab"
+                                 tabindex="0">
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="container-right">
+            <div class="header">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item col-3" role="presentation">
+                        <button class="nav-link active col-12" id="table-current" data-bs-toggle="tab"
+                                data-bs-target="#table-pannel"
+                                type="button" role="tab" aria-controls="table-pannel" aria-selected="true">
+                            <i class="fas fa-tablets" style="margin-right: 5px"></i><span>Bàn</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="container-content">
+                <div class="wrapper-content text-center" style="height: 580px;">
+                    <div class="content" style="height: 100%;overflow: hidden;background-color: rgba(0, 8, 16, 0.04); ">
+                        <div class="board" style="height: 580px;">
+                            <i class="fas fa-mug-hot"></i>
+                            <p class="title">Chưa có order nào </p>
+                            <p class="title-complaint">Vui lòng chọn bàn hoặc món trong menu</p>
+
+                        </div>
+                        <div id="contentItems" class="content-items hide">
+
+                        </div>
+                    </div>
+
+                    <div class="wrapper-footer">
+                        <div class="wrapper-footer-header">
+                            <span>Tổng tiền</span>
+                            <span id="totalAmount"></span>
+                        </div>
+                        <div class="wrapper-footer-btn mt-5">
+                            <button type="button" class="btn btn-success" id="btnPayment">
+                                <i class="fas fa-money-bill"></i>Thanh Toán
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="shop/modalProductDetail"/>
+<th:block th:replace="shop/modalPayment"/>
+<th:block th:replace="shop/modalChangeToTable"/>
+</body>
+<script src="/assets/jquery/jquery-3.7.0.min.js"></script>
+<script src="/assets/js/jquery.validate.min.js"></script>
+<script src="/assets/bootstrap/v.5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="/assets/iziToast/iziToast-1.4.0.js"></script>
+<script src="/assets/js/app.js"></script>
+
+
+<script>
+    const page = {
+        url: {
+            getALLTabOrders: App.API_TABLE_ORDER,
+            getAllTableSelect: App.API_TABLE_ORDER + '/tables-without-tableSend',
+            getTableById: App.API_TABLE_ORDER,
+            getAllProducts: App.API_PRODUCT,
+            getProductById: App.API_PRODUCT,
+            getOrderDetailsByTableId: App.API_ORDER,
+            getOrderByTableId: App.API_ORDER_BY_TABLE_ID,
+            getProductByName: App.API_PRODUCT_SEARCH_NAME,
+            createOrder: App.API_ORDER + '/create',
+            updateOrder: App.API_ORDER + '/update',
+            payBillOrder: App.API_BILL,
+            changToTable: App.API_ORDER + '/update/change-to-table',
+            deleteProductByOrderDetailId: App.API_ORDER + '/delete'
+        },
+        elements: {},
+        loadData: {},
+        commands: {},
+        dialogs: {
+            elements: {},
+            commands: {}
+        },
+        initializeControlEvent: {}
+    }
+
+    page.elements.btnNavLink = $('.nav-tabs button.nav-link');
+    page.elements.menuTab = $('#menu-tab');
+    page.elements.tablePannel = $('#table-pannel');
+    page.elements.menuPannel = $('#menu-pannel');
+    page.elements.menuPannelContents = $('#menu-pannel .contents');
+    page.elements.Search = $('#container-content-left');
+    page.elements.divSearchProduct = $('#div-search-product');
+    page.elements.boardWaiting = $('.board');
+    page.elements.contentItems = $('#contentItems');
+    page.elements.btnShowHide = $('#btnShowHide');
+    page.elements.tabHeader = $('.tab-header');
+    page.elements.tabContentItem = $('.tab-content-item');
+    page.elements.wrapperFooter = $('.wrapper-footer');
+    page.elements.tableCurrent = $('#table-current');
+    page.elements.btnShowProductDetailModal = $('#btnShowProductDetailModal');
+    page.elements.tableCurrent = $('#table-current');
+    page.elements.btnShowProductDetailModal = $('#btnShowProductDetailModal');
+
+    page.dialogs.elements.modalProductDetail = $('#modalProductDetail');
+    page.dialogs.elements.frmProductDetail = $('#frmProductDetail');
+    page.dialogs.elements.errorAreaProductDetail = $('#modalProductDetail .error-area');
+    page.dialogs.elements.imgPro = $('#imgPro');
+    page.dialogs.elements.idPro = $('.idPro');
+    page.dialogs.elements.titlePro = $('#titlePro');
+    page.dialogs.elements.pricePro = $('#pricePro');
+    page.dialogs.elements.quantityPro = $('#quantityPro');
+    page.dialogs.elements.unitPro = $('#unitPro');
+    page.dialogs.elements.notePro = $('#notePro');
+    page.dialogs.elements.btnOrderProduct = $('#btnOrderProduct');
+
+    page.dialogs.elements.modalPayment = $('#modalPayment');
+    page.elements.tbOrderItemsBody = $("#tbOrderItems tbody")
+    page.dialogs.elements.btnPayment = $('#btnPayment');
+    page.dialogs.elements.btnPaymentOrder = $('#btnPaymentOrder');
+
+    page.dialogs.elements.modalChangToTable = $('#modalChangeToTable')
+    page.dialogs.elements.tableSend = $('#tableSend');
+    page.dialogs.elements.tableSelect = $('#tableSelect');
+    page.dialogs.elements.btnChangeToTable = $('#btnChangeToTable');
+
+    page.elements.searchProduct = $('#searchProduct');
+
+
+    let tableStatus = 'EMPTY';
+    let product = new Product();
+    let tableOrder = new TableOrder();
+    let category = new Category();
+    let tables = []
+    let currentTable = 0;
+    // let orderDetails = [];
+
+    page.commands.renderTable = (tableOrder) => {
+
+        return `
+            <div id="tr_${tableOrder.id}" class="container-tab-item col-3" data-id="${tableOrder.id}" data-status="${tableOrder.status}">
+              <div  class="tab-header text-center ${tableOrder.status === 'EMPTY' ? '' : 'busy'}">
+                <button class="showModalTable" style="border: none; background-color: none; padding: 5px ; border-radius: 50%;">
+                  <i class="fas fa-coffee"></i>
+                </button>
+              </div>
+              <div class="tab-content-item  text-center ${tableOrder.status === 'EMPTY' ? '' : 'busy'}">
+                <span>${tableOrder.status}</span>
+                <p>${tableOrder.title}</p>
+               </div>
+            </div>
+        `
+    }
+
+    page.commands.renderProduct = (product) => {
+        const avatar = product.avatar
+        return `
+            <div class="container-product-item"  data-id="${product.id}">
+                  <div   class="image-product" style="height: 180px ;width: 180px;">
+                      <img src="${avatar.fileUrl}" style="height: 100%; width: 100%">
+                  </div>
+                  <div class="content-product text-center">
+                      <div class="product-title" >
+                          ${product.title}
+                      </div>
+                      <div class="product-title-bottom" style="font-size: 16px">
+                      <span>
+                          ${product.price.toLocaleString('vi', {style: 'currency', currency: 'VND'})}
+                      </span>
+                      <span>
+                        ${product.unit}
+                      </span>
+                      </div>
+                  </div>
+                </div>
+  `
+    }
+
+    page.commands.renderOrderDetail = (obj) => {
+        return `
+        <div class="item d-flex" id="div_${obj.orderDetailId || obj.id}">
+            <div class="image">
+                <img src="${obj.avatar.fileUrl}" style="height: 115px; width: 120px;" alt="">
+            </div>
+            <div class="item-content" style="margin-left: 10px;">
+                <div class="title-close d-flex justify-content-between">
+                    <span>${obj.title}</span>
+                    <button class="btn-delete" data-order-detail-id="${obj.orderDetailId || obj.id}" data-amount="${obj.amount}">
+                        <span>X</span>
+                    </button>
+                </div>
+                <div class="price-quantity d-flex justify-content-between">
+                    <span>Giá : ${obj.price.toLocaleString('vi', {style: 'currency', currency: 'VND'})}</span>
+                    <form action="">
+                        <div class="quantity d-flex">
+                            <span>${obj.quantity}</span>
+                        </div>
+                    </form>
+                    <span>${obj.amount.toLocaleString('vi', {style: 'currency', currency: 'VND'})}</span>
+                </div>
+                <div class="note d-flex">
+                    <span>Note: ${obj.note}</span>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    page.commands.renderListOrderDetailByTable = (obj) => {
+        return `
+                        <tr>
+                            <td class="text-center">${obj.title}</td>
+                            <td class="text-center">${obj.quantity}</td>
+                            <td class="text-center">${obj.price}</td>
+                            <td class="text-center">${obj.amount}</td>
+                        </tr>
+                `
+
+    }
+
+    page.commands.renderTableSelect = (tableOrder) => {
+        return `
+                <option value="${tableOrder.id}">${tableOrder.title}</option>
+            `;
+    }
+
+    page.commands.getAllTable = () => {
+        $.ajax({
+            type: 'GET',
+            url: page.url.getALLTabOrders
+        })
+            .done((data) => {
+                tables = data;
+                page.elements.tablePannel.empty();
+                tables.forEach(item => {
+                    tableOrder = item;
+                    let str = page.commands.renderTable(tableOrder)
+                    page.elements.tablePannel.append(str)
+
+                })
+
+            })
+    }
+
+    page.commands.getTableById = (tableId) => {
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getTableById + '/' + tableId,
+        });
+    }
+
+    page.commands.getAllTableSelect = (TableSelectId) => {
+        $.ajax({
+            type: 'GET',
+            url: page.url.getAllTableSelect + '/' + TableSelectId
+        })
+            .done((data) => {
+
+                console.log(data)
+                page.dialogs.elements.tableSelect.empty();
+
+                $.each(data, (index, item) => {
+                    const str = page.commands.renderTableSelect(item);
+                    page.dialogs.elements.tableSelect.append(str);
+                })
+            })
+            .fail((jqXHR) => {
+                console.log(jqXHR)
+            })
+    }
+
+
+    page.commands.getAllProduct = () => {
+        page.elements.menuPannel.empty();
+        $.ajax({
+            type: 'GET',
+            url: page.url.getAllProducts
+        })
+            .done((data) => {
+                data.forEach(item => {
+                    product = item;
+                    const str = page.commands.renderProduct(product)
+                    page.elements.menuPannel.append(str);
+                })
+            })
+    }
+
+    page.commands.getProductById = (productId) => {
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getProductById + '/' + productId
+        })
+
+    }
+
+    page.commands.getListOrderDetailByTableId = (tableId) => {
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getOrderDetailsByTableId + '/list-order-details' + '/' +tableId
+        })
+            .done((data) => {
+                if (data && data.length > 0) {
+                    let totalAmount = 0;
+                    page.elements.tbOrderItemsBody.empty();
+
+                    $.each(data, (index, item) => {
+                        totalAmount += item.amount;
+
+                        let str = `
+                        <tr>
+                            <td class="text-center">${item.title}</td>
+                            <td class="text-center">${item.quantity}</td>
+                            <td class="text-center">${item.note}</td>
+                            <td class="text-center">${item.price.toLocaleString('vi', {
+                            style: 'currency',
+                            currency: 'VND'
+                        })}</td>
+                            <td class="text-center">${item.amount.toLocaleString('vi', {
+                            style: 'currency',
+                            currency: 'VND'
+                        })}</td>
+
+                        </tr>
+
+                `
+                        page.elements.tbOrderItemsBody.append(str);
+                    })
+
+                }
+            })
+            .fail((jqXHR) => {
+                console.log(jqXHR);
+            })
+    }
+
+    page.commands.getOrderDetailsByTableId = (tableId) => {
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getOrderByTableId + '/' + tableId
+        })
+            .done((data) => {
+                // orderDetails = data;
+
+                if (data && data.length > 0) {
+                    page.elements.contentItems.empty();
+                    page.elements.tbOrderItemsBody.empty();
+                    $('#totalAmountModal').empty();
+                    let totalAmount = 0;
+                    $.each(data, (index, item) => {
+                        const str = page.commands.renderOrderDetail(item);
+                        page.elements.contentItems.append(str);
+                        totalAmount += item.amount;
+
+                        const str1 = page.commands.renderListOrderDetailByTable(item)
+                        page.elements.tbOrderItemsBody.append(str1);
+
+
+                    })
+                    let strTotal = totalAmount.toLocaleString(('vi', {style: 'currency', currency: 'VND'}));
+                    console.log(strTotal)
+                    let str2 = `
+                           <td></td>
+                           <td></td>
+                           <td></td>
+                           <td class="text-center">Tổng tiền : ${strTotal}</td>
+                   `
+                    $('#totalAmountModal').prepend(str2);
+
+                    $('#totalAmount').text(totalAmount.toLocaleString('vi', {style: 'currency', currency: 'VND'}))
+
+
+                    page.elements.boardWaiting.addClass('hide');
+                    page.elements.contentItems.removeClass('hide');
+                } else {
+                    page.elements.boardWaiting.removeClass('hide');
+                    page.elements.contentItems.addClass('hide');
+
+                    $('#totalAmount').text('0đ')
+                }
+            })
+            .fail((jqXHR) => {
+                page.elements.boardWaiting.removeClass('hide');
+                page.elements.contentItems.addClass('hide');
+            })
+    }
+
+    page.commands.getProductByName = () => {
+        let searchProduct = page.elements.searchProduct.val();
+        page.elements.menuPannel.empty();
+        if (searchProduct == "") {
+            $.ajax({
+                type: 'GET',
+                url: page.url.getAllProducts
+            })
+                .done((data) => {
+                    data.forEach(item => {
+                        product = item;
+                        const str = page.commands.renderProduct(product)
+                        page.elements.menuPannel.prepend(str);
+                    })
+                })
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: page.url.getProductByName + "/" + searchProduct
+            })
+                .done((data) => {
+                    data.forEach(item => {
+                        product = item;
+                        const str = page.commands.renderProduct(product)
+                        page.elements.menuPannel.prepend(str);
+                    })
+                })
+        }
+
+    }
+
+    page.commands.handleAddEventShowProductDetail = () => {
+        page.dialogs.elements.modalProductDetail.modal('show');
+    }
+
+    page.commands.handleAddEventShowPayment = () => {
+        page.dialogs.elements.modalPayment.modal('show');
+    }
+
+    page.commands.handAddEventShowChangeToTable = () => {
+        console.log("currentTable", currentTable)
+        page.commands.getTableById(currentTable).then((data) => {
+            if (data !== {}) {
+                page.dialogs.elements.tableSend.val(data.title);
+                page.commands.getAllTableSelect(currentTable);
+                page.dialogs.elements.modalChangToTable.modal('show');
+            }
+        })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // page.commands.setOrderDetails = (obj) => {
+    //     let hasData = false;
+    //
+    //     if (orderDetails.length > 0) {
+    //         orderDetails.filter((item) => {
+    //             if (item.orderDetailId === obj.orderDetailId) {
+    //                 item = obj;
+    //                 hasData = true;
+    //             }
+    //         })
+    //
+    //         if (!hasData) {
+    //             orderDetails.push(obj);
+    //         }
+    //     }
+    //     else {
+    //         orderDetails.push(obj);
+    //     }
+    // }
+
+    page.commands.doCreateOrder = (currentTableId, productId, quantity, note) => {
+        let obj = {
+            tableId: currentTableId,
+            quantity: quantity,
+            productId: productId,
+            note: note
+        }
+
+        $.ajax({
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            type: 'POST',
+
+            url: page.url.createOrder,
+            data: JSON.stringify(obj)
+        })
+            .done((data) => {
+                page.elements.contentItems.empty();
+                tableStatus = 'BUSY';
+
+                let totalAmount = data.totalAmount;
+                const str = page.commands.renderOrderDetail(data);
+                page.elements.contentItems.append(str);
+
+                page.elements.boardWaiting.addClass('hide');
+                page.elements.contentItems.removeClass('hide');
+
+                $('#totalAmount').text(totalAmount.toLocaleString('vi', {style: 'currency', currency: 'VND'}))
+
+                const newTableOrder = data.table;
+                const tableStr = page.commands.renderTable(newTableOrder);
+                $('#tr_' + currentTableId).replaceWith(tableStr);
+
+                App.IziToast.showSuccessAlert("Tạo đơn thành công ")
+                page.dialogs.elements.modalProductDetail.modal('hide');
+            })
+            .fail((jqXHR) => {
+                const responseJSON = jqXHR.responseJSON;
+                page.dialogs.elements.errorAreaProductDetail.empty();
+                let str = '';
+
+                $.each(responseJSON, (k, v) => {
+                    str += `<label for="${k}Pro">${v}</label>`
+                })
+
+                page.dialogs.elements.errorAreaProductDetail.append(str).removeClass('hide').addClass('show');
+
+                console.log(jqXHR);
+                App.IziToast.showErrorAlert("Tạo đơn thất bại")
+            })
+
+    }
+
+    page.commands.doUpdateOrder = (currentTableId, productId, quantity, note) => {
+        let obj = {
+            tableId: currentTableId,
+            quantity: quantity,
+            productId: productId,
+            note: note
+        }
+
+        $.ajax({
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            type: 'PATCH',
+            url: page.url.updateOrder,
+            data: JSON.stringify(obj)
+        })
+            .done((data) => {
+                page.elements.contentItems.empty();
+
+                // page.commands.setOrderDetails(data);
+                const orderDetails = data.products;
+
+                let totalAmount = data.totalAmount;
+
+                $.each(orderDetails, (index, item) => {
+                    const str = page.commands.renderOrderDetail(item);
+                    page.elements.contentItems.append(str);
+                })
+
+
+                $('#totalAmount').text(totalAmount.toLocaleString('vi', {style: 'currency', currency: 'VND'}))
+
+                App.IziToast.showSuccessAlert("Thêm món thành công");
+                page.dialogs.elements.modalProductDetail.modal('hide');
+            })
+            .fail((jqXHR) => {
+                const responseJSON = jqXHR.responseJSON;
+
+                page.dialogs.elements.errorAreaProductDetail.empty();
+                let str = '';
+
+                $.each(responseJSON, (k, v) => {
+                    str += `<label for="${k}Pro">${v}</label>`
+                })
+
+                page.dialogs.elements.errorAreaProductDetail.append(str).removeClass('hide').removeAttr('style').addClass('show');
+
+                console.log(jqXHR);
+                App.IziToast.showErrorAlert("Thêm món vào bàn thất bại")
+            })
+    }
+
+    page.commands.doPaymentOrder = (currentTableId) => {
+        let obj = {
+            tableId: currentTableId
+        }
+
+        $.ajax({
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            type: 'POST',
+            url: page.url.payBillOrder + '/' + currentTableId,
+            data: JSON.stringify(obj)
+        })
+            .done((data) => {
+                console.log(data)
+                page.elements.contentItems.empty();
+                tableStatus = 'EMPTY';
+                let totalAmount = 0;
+                let items = data.products;
+
+                $.each(items, (index, item) => {
+                    const str = page.commands.renderOrderDetail(item);
+                    page.elements.contentItems.append(str);
+                })
+
+                page.elements.boardWaiting.removeClass('hide');
+                page.elements.contentItems.addClass('hide');
+
+
+                const tableStr = page.commands.renderTable(data.table);
+                $('#tr_' + currentTableId).replaceWith(tableStr)
+                $('#totalAmount').text(totalAmount.toLocaleString('vi', {style: 'currency', currency: 'VND'}))
+
+                App.IziToast.showSuccessAlert("Thanh toán thành công");
+                page.dialogs.elements.modalPayment.modal('hide');
+
+
+            })
+            .fail(() => {
+                App.IziToast.showErrorAlert("Thanh toán thất bại")
+            })
+    }
+
+    page.commands.doChangeToTable = (currentTable) => {
+        const tableIdBusy = currentTable;
+        const tableIdEmpty = page.dialogs.elements.tableSelect.val();
+
+        let obj = {
+            tableIdEmpty,
+            tableIdBusy
+        }
+        $.ajax({
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json'
+            },
+            type: 'PATCH',
+            url: page.url.changToTable,
+            data: JSON.stringify(obj)
+        })
+            .done((data) =>{
+                tableStatus = 'EMPTY';
+
+                // const senderTable = data.tableReceive;
+                // const receiveTable = data.tableSend;
+
+                // const senderTableStr = page.commands.renderTable(senderTable);
+                // $('#tr_' + senderTable.id).replaceWith(senderTableStr);
+
+
+                // const receiveTableStr = page.commands.renderTable(receiveTable);
+                // $('#tr_' + receiveTable.id).replaceWith(receiveTableStr);
+                // console.log(receiveTable);
+
+                tables.filter((item) => {
+                    if (item.id == tableIdEmpty) {
+                        item.status = 'BUSY'
+                    }
+
+                    if (item.id == currentTable) {
+                        item.status = 'EMPTY'
+                    }
+                })
+
+                page.elements.tablePannel.empty();
+
+                tables.forEach(item => {
+                    let str = page.commands.renderTable(item)
+                    page.elements.tablePannel.append(str)
+
+                })
+
+                page.elements.boardWaiting.removeClass('hide');
+                page.elements.contentItems.empty().addClass('hide');
+                $('#totalAmount').text('0đ')
+
+                page.dialogs.elements.modalChangToTable.modal('hide');
+                App.IziToast.showSuccessAlert("Thực hiện chuyển bàn thành công");
+            })
+            .fail((jqXHR) => {
+                App.IziToast.showErrorAlert("Thực hiện chuyển bàn thất bại");
+            })
+
+
+
+    }
+
+
+    page.commands.showHideSearchDiv = () => {
+        if (page.elements.menuPannel.hasClass('active', 'show')) {
+            page.elements.divSearchProduct.removeClass('hide');
+        } else {
+            page.elements.divSearchProduct.addClass('hide');
+        }
+    }
+
+    page.loadData = () => {
+        page.commands.getAllTable();
+
+        page.commands.getAllProduct();
+    }
+
+    page.initializeControlEvent = () => {
+        const tabEl = document.querySelector('button[data-bs-toggle="tab"]')
+        tabEl.addEventListener('shown.bs.tab', event => {
+            event.target // newly activated tab
+            event.relatedTarget // previous active tab
+        })
+
+
+        page.elements.tablePannel.on('click', '.container-tab-item', function () {
+            currentTable = $(this).data('id');
+            tableStatus = $(this).data('status');
+            page.elements.tableCurrent.find('span').text('Bàn ' + currentTable);
+            page.commands.getOrderDetailsByTableId(currentTable);
+        })
+
+        page.dialogs.elements.btnOrderProduct.on('click', function () {
+            page.dialogs.elements.frmProductDetail.trigger('submit');
+        })
+
+        page.elements.contentItems.on('click', '.btn-delete', function () {
+            const orderDetailId = $(this).data('order-detail-id');
+            const amount = $(this).data('amount');
+                App.SweetAlert.showDeleteConfirmDialog().then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: page.url.deleteProductByOrderDetailId + '/' + orderDetailId
+                    })
+                        .done((data) => {
+                            console.log(data)
+                            $('#div_' + orderDetailId).remove();
+                            let totalAmount = $('#totalAmount').text();
+                            totalAmount = totalAmount.replace('₫', '');
+                            totalAmount = totalAmount.replace('.', '');
+                            const newTotalAmount = totalAmount - amount;
+                            $('#totalAmount').text(newTotalAmount.toLocaleString('vi', {style: 'currency', currency: 'VND'}));
+
+                            if (data.status === "EMPTY"){
+                                tableStatus = 'EMPTY'
+                                const table = page.commands.renderTable(data);
+                                $('#tr_' + data.id).replaceWith(table);
+                                page.elements.boardWaiting.removeClass('hide');
+                                page.elements.contentItems.addClass('hide');
+                            }
+
+
+                        })
+                        .fail((jqXHR) => {
+                            console.log(jqXHR);
+                            App.IziToast.showErrorAlert('Xoá sản phẩm thất bại');
+                        })
+                }
+            })
+
+        })
+
+
+        page.dialogs.elements.btnPayment.on('click', function () {
+            page.commands.getOrderDetailsByTableId(currentTable).then((data) => {
+                if (data !== undefined && data !== null && data.length > 0) {
+                    $('#tableId').empty();
+                    let str = `
+                        <span>Chi tiết hoá đơn bàn ${currentTable}</span>
+                    `
+
+                    page.commands.handleAddEventShowPayment();
+                    $('#tableId').append(str);
+                }
+                else {
+                    App.IziToast.showErrorAlert('Bàn này không có hoá đơn');
+                }
+            });
+        })
+
+        page.dialogs.elements.btnPaymentOrder.on('click', function () {
+            page.commands.doPaymentOrder(currentTable);
+        })
+
+        page.dialogs.elements.btnChangeToTable.on('click', function () {
+            page.commands.doChangeToTable(currentTable)
+        })
+
+        page.elements.tablePannel.on('click', '.showModalTable', function () {
+            currentTable = $(this).parent().parent().data('id');
+            page.commands.getOrderDetailsByTableId(currentTable).then((data) => {
+
+                if(data !== undefined && data !== null && data.length > 0){
+                    page.commands.handAddEventShowChangeToTable(currentTable);
+                }
+                else {
+                    App.IziToast.showErrorAlert('Bàn này không có hoá đơn không thể thực hiện việc chuyển bàn');
+                }
+            });
+        })
+
+
+
+
+        page.elements.menuPannel.on('click', '.container-product-item', function () {
+            const productId = $(this).data('id');
+            page.commands.getProductById(productId).then((data) => {
+                $('#frmProductDetail').empty();
+                let str = `
+                <input class="idPro" type="hidden" value="${data.id}">
+                <div class="col-6 mb-3 text-center">
+                    <div class="col-12">
+                        <span style="font-size: 24px">${data.title}</span>
+                        <div class="imageProductDetail">
+                            <img id="imgPro" style="height: 100%;width: 100%; border: none; border-radius: 15px;" src="${data.avatar.fileUrl}" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 mb-5 mr-3" style="margin-left: 15px">
+                    <div class="col-12" style="margin-top:28px">
+                        <p id="titlePro"  style="font-size: 22px">${data.title}</p>
+                        <div class="price">
+                            <p>Giá : <span id="pricePro">${data.price.toLocaleString('vi', {style: 'currency', currency: 'VND'})}</span></p>
+                        </div>
+                        <div class="quantityProductDetail">
+                            <p>
+                                Số Lượng
+                                <span>
+                                    <input id="quantityPro" name="quantityPro" class="col-6 form-control" type="number" value="1">
+                                </span>
+                            </p>
+
+                        </div>
+                        <div class="unit">
+                            <p>Đơn Vị : <span id="unitPro">${data.unit}</span></p>
+                        </div>
+                        <div class="note">
+                            <p for="notePro">Ghi Chú <input class="form-control" id="notePro" type="text" ></p>
+                        </div>
+                    </div>
+                </div>
+               `;
+
+                $('#frmProductDetail').append(str);
+                page.commands.handleAddEventShowProductDetail();
+
+            });
+        })
+
+        page.elements.searchProduct.on('change', function () {
+            page.commands.getProductByName();
+        })
+
+        page.elements.btnNavLink.on('click', () => {
+            page.commands.showHideSearchDiv();
+        })
+
+        page.elements.tablePannel.on('click', '.tab-content-item', () => {
+            page.elements.menuTab.trigger('click');
+            page.commands.showHideSearchDiv();
+        })
+
+    }
+
+    $(() => {
+
+        page.loadData();
+
+        page.initializeControlEvent();
+    })
+
+    //validate Front-End
+    page.dialogs.elements.frmProductDetail.validate({
+        rules: {
+            quantityPro: {
+                required: true,
+                min: 1
+            }
+        },
+        messages: {
+            quantityPro: {
+                required: 'Số lượng của món phải lớn hơn 0',
+                min: 'Số lượng ít nhất là  {0}'
+            }
+        },
+        errorLabelContainer: "#modalProductDetail .error-area",
+        errorPlacement: function (error, element) {
+            error.appendTo("#modalProductDetail .error-area");
+        },
+        showErrors: function (errorMap, errorList) {
+            if (this.numberOfInvalids() > 0) {
+                page.dialogs.elements.errorAreaProductDetail.removeClass("hide").addClass("show");
+            } else {
+                page.dialogs.elements.errorAreaProductDetail.removeClass("show").addClass("hide").empty();
+                $("#frmProductDetail input.error").removeClass("error");
+            }
+            this.defaultShowErrors();
+        },
+        submitHandler: function () {
+            let productId = $('.idPro').val();
+            let quantity = $('#quantityPro').val();
+            let note = $('#notePro').val();
+            if (tableStatus == "EMPTY") {
+                page.commands.doCreateOrder(currentTable, productId, quantity, note);
+            } else {
+                page.commands.doUpdateOrder(currentTable, productId, quantity, note);
+            }
+        }
+    })
+
+
+</script>
+
+</html>

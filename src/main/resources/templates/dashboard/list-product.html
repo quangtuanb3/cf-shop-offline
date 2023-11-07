@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard Coffee</title>
+    <th:block th:replace="/layout/head :: head"></th:block>
+    <link rel="stylesheet" href="/assets/bootstrap/v.5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/sweetalert2/sweetalert2.min.css">
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/preview-image.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <style>
+        #paginationNav {
+            margin-top: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+<div id="wrapper">
+    <th:block th:replace="/layout/topbar :: topbarProduct"></th:block>
+    <th:block th:replace="/layout/left-sidebar :: left-sidebar"></th:block>
+
+    <th:block th:replace="/dashboard/frm_list_table :: frm_list_table"/>
+    <!-- Modal Create Customer -->
+    <th:block th:replace="/dashboard/modal-create :: modal-create"></th:block>
+
+    <!-- Modal Update Customer -->
+    <th:block th:replace="/dashboard/modal-update :: modal-update"></th:block>
+
+
+    <div class="content-page">
+        <div class="content">
+            <div class="container-fluid">
+                <input type="hidden" id="currentRow"/>
+                <div class="table-title">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h1>Danh sách món</h1>
+                        </div>
+                        <div class="col-sm-8">
+                            <button type="button" class="btn btn-outline-light" id="create">
+                                <i class=" fa-solid fa-plus"></i>
+                                Thêm món
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+
+                    <table id="tbProduct" class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Tên món</th>
+                            <th scope="col">Ảnh</th>
+                            <th scope="col">Giá</th>
+                            <th scope="col">Đơn Vị</th>
+                            <th scope="col">Loại</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="row">
+                        <nav id="paginationNav">
+                            <ul class="pagination justify-content-center">
+                                <!-- Các nút phân trang sẽ được thêm vào đây -->
+                            </ul>
+                        </nav>
+                </div>
+
+                <div class="loader hide"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <th:block th:replace="/layout/footer :: footer"></th:block>
+</div>
+
+<th:block th:replace="/layout/script :: script"></th:block>
+<script src="/assets/jquery/jquery-3.7.0.min.js"></script>
+<script src="/assets/jquery/jquery.validate.js"></script>
+<script src="/assets/bootstrap/v.5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="/assets/js/magnific-popup-1.1.0.js"></script>
+
+
+<script>
+    const page = {
+        url: {
+            getAllProductsPage: App.API_PRODUCT + "/page" ,
+            getAllProducts:App.API_PRODUCT,
+            getALLTabOrders: App.API_TABLE_ORDER,
+            getProductById: App.API_PRODUCT,
+            getOrderDetailsByTableId: App.API_ORDER_BY_TABLE_ID,
+            getOrderByTableId : App.API_ORDER_BY_TABLE_ID,
+            getProductByName:App.API_PRODUCT_SEARCH_NAME,
+            getAllCategories: App.API_CATEGORY,
+
+            doCreate: App.API_CREATE_PRODUCT,
+            doUpdate: App.API_UPDATE_PRODUCT,
+            doDelete: App.API_DELETE_PRODUCT
+
+        },
+        elements: {},
+        loadData: {},
+        commands: {},
+        dialogs: {
+            elements: {},
+            commands: {},
+            loadData: {}
+        }
+    }
+
+    page.elements.frmListProduct = $('#tbProduct tbody')
+
+    page.elements.loader = $(".loader");
+    page.elements.tempProduct = $("#tempProduct");
+    page.elements.currentRow = $("#currentRow");
+    page.elements.btnShowCreateForm = $("#create");
+
+    page.elements.pagination = $('.pagination')
+
+
+    page.dialogs.elements.frmCreateCustomer = $('#frmCreateProduct');
+    page.dialogs.elements.modalCreate = $('#mdCreate')
+    page.dialogs.elements.errorCreateArea = $('#mdCreate .modal-body .modal-alert-danger')
+    page.dialogs.elements.productTitle = $('#productTitle')
+    page.dialogs.elements.productPrice = $('#productPrice')
+    page.dialogs.elements.productUnit = $('#productUnit')
+    page.dialogs.elements.description = $('#description')
+    page.dialogs.elements.btnCreate = $('#btnCreate')
+    page.dialogs.elements.categorySelectCreate = $('#categorySelectCreate')
+
+    page.elements.btnShowUpdateForm = $("a.update-modal");
+    page.dialogs.elements.frmUpdateCustomer = $('#frmUpdateProduct');
+    page.dialogs.elements.modalUpdate = $('#mdUpdate')
+    page.dialogs.elements.errorUpdateArea = $('#mdUpdate .modal-body .modal-alert-danger')
+    page.dialogs.elements.productTitleUP = $('#productTitleUP')
+    page.dialogs.elements.productPriceUp = $('#productPriceUp')
+    page.dialogs.elements.productUnitUp = $('#productUnitUp')
+    page.dialogs.elements.btnUpdate = $('#btnUpdate')
+    page.dialogs.elements.categorySelectUpdate = $('#categorySelectUpdate')
+
+
+    page.dialogs.elements.wrapper = $("section .wrapper");
+    page.dialogs.elements.imageFileCreate = $("#imageFileCreate");
+    page.dialogs.elements.imageFileUpdate = $("#imageFileUpdate");
+    page.dialogs.elements.wrapperContent = $("section .wrapper .content");
+    page.dialogs.elements.imagePreview = $("section .image-preview canvas");
+    page.dialogs.elements.canvasCreate = $("#canvasCreate");
+    page.dialogs.elements.canvasUpdate = $("#canvasUpdate");
+    page.dialogs.elements.contextCreate = page.dialogs.elements.canvasCreate[0].getContext('2d');
+    page.dialogs.elements.contextUpdate = page.dialogs.elements.canvasUpdate[0].getContext('2d');
+    page.dialogs.elements.imagePreview.css("display", "none");
+    page.dialogs.elements.divImagePreviewCreate = $("#mdCreate div.image-preview, #mdCreate div.file-name");
+    page.dialogs.elements.divImagePreviewUpdate = $("#mdUpdate div.image-preview, #mdUpdate div.file-name");
+    page.dialogs.elements.btnClearImagePreview = $(".clear-image-preview i");
+
+
+    page.dialogs.elements.searcheProduct = $('#searchProduct')
+    page.dialogs.elements.btnSearchProduct= $('#btnSearchProduct')
+
+
+    // page.elements.btnDelete = $("#tempProduct body");
+    let productId = 0;
+
+    let product = new Product();
+    let avatar = new Avatar();
+
+    let tempProduct = jQuery.validator.format($.trim(page.elements.tempProduct.val().toString()));
+
+    page.commands.addRow = (price) => {
+        let image_thumbnail = App.BASE_URL_CLOUD_IMAGE + "/" + App.IMAGE_SCALE_W_100_h_80_Q_90 + "/" + avatar.fileFolder + "/" + avatar.fileName;
+        let imageFileUrl = App.BASE_URL_CLOUD_IMAGE + "/" + avatar.fileFolder + "/" + avatar.fileName;
+        let aClass = "image-popup-vertical-fit";
+
+        page.elements.frmListProduct.append($(tempProduct(product.id, product.title, price, product.unit,  product.category, imageFileUrl, image_thumbnail, aClass)));
+    }
+
+    page.commands.replace = (productId, price) => {
+        let image_thumbnail = App.BASE_URL_CLOUD_IMAGE + "/" + App.IMAGE_SCALE_W_100_h_80_Q_90 + "/" + avatar.fileFolder + "/" + avatar.fileName;
+        let imageFileUrl = App.BASE_URL_CLOUD_IMAGE + "/" + avatar.fileFolder + "/" + avatar.fileName;
+        let aClass = "image-popup-vertical-fit";
+
+
+        $('#tr_' + productId).replaceWith($(tempProduct(product.id, product.title, price, product.unit,  product.categoryTitle, imageFileUrl, image_thumbnail, aClass)));
+    }
+
+
+
+    page.commands.getAllProduct = (pageProduct, pageSize) => {
+        $.ajax({
+            type: 'GET',
+            url: page.url.getAllProductsPage,
+            data: {
+                page: pageProduct,
+                pageSize: pageSize
+            }
+        })
+            .done((data) => {
+                page.elements.frmListProduct.empty();
+                let price = 0;
+                $.each(data.content, (index, item) => {
+                    product = new Product(item.id, item.title, item.price, item.unit,item.category.title);
+                    avatar = item.avatar;
+                    price = product.price.toLocaleString('vi', {style: 'currency', currency: 'VND'});
+                    page.commands.addRow(price);
+
+                })
+                page.commands.displayPagination(data.totalPages, data.number + 1);
+                page.commands.showCreateModal();
+                page.commands.showUpdateModal();
+                // page.commands.addEventShowActionButton();
+            })
+            .fail(function () {
+                App.SweetAlert.showErrorAlert(App.AlertMessageVi.ERROR_404);
+            });
+    }
+
+
+    page.commands.displayPagination = (totalPages, currentPage) => {
+        page.elements.pagination.empty();
+
+        let previousBtn = '<li class="page-item"><a class="page-link" href="#" onclick="page.commands.getAllProduct(' + (currentPage - 1) + ', 10)">Previous</a></li>';
+        page.elements.pagination.append(previousBtn);
+
+        for (let i = 1; i <= totalPages; i++) {
+            let pageBtn = '<li class="page-item ' + (i === currentPage ? 'active' : '') + '"><a class="page-link" href="#" onclick="page.commands.getAllProduct(' + i + ', 10)">' + i + '</a></li>';
+            page.elements.pagination.append(pageBtn);
+        }
+
+        let nextBtn = '<li class="page-item"><a class="page-link" href="#" onclick="page.commands.getAllProduct(' + (currentPage + 1) + ', 10)">Next</a></li>';
+        page.elements.pagination.append(nextBtn);
+    };
+
+    page.commands.getProductById = (productId) => {
+        return $.ajax({
+            type: 'GET',
+            url: page.url.getAllProducts + '/' + productId
+        });
+    }
+
+    page.commands.getCategories = () => {
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: 'GET',
+            url: page.url.getAllCategories,
+        })
+            .done((data) => {
+                console.log(data)
+                page.dialogs.elements.categorySelectCreate.empty();
+                page.dialogs.elements.categorySelectUpdate.empty();
+
+                $.each(data, function (index, item) {
+                    page.dialogs.elements.categorySelectCreate.append($('<option>').val(item.id).text(item.title));
+                    page.dialogs.elements.categorySelectUpdate.append($('<option>').val(item.id).text(item.title));
+                })
+            })
+            .fail((jqXHR, textStatus, errorThrown) => {
+                console.log('Error: ' + textStatus + ' ' + errorThrown);
+            })
+    }
+
+    page.commands.showCreateModal = () => {
+        page.elements.btnShowCreateForm.on("click", function () {
+            delete product.id;
+            page.commands.getCategories();
+            page.dialogs.elements.modalCreate.modal('show');
+            page.commands.clearForm();
+        });
+
+    }
+
+
+    page.commands.showUpdateModal = () => {
+
+        $('a.update-modal').on("click", function () {
+            page.commands.getCategories();
+            productId = $(this).data('id');
+            page.commands.getProductById(productId).then((data) => {
+                if (data !== {}) {
+                    product = data;
+                    console.log(product)
+                    avatar = product.avatar;
+
+                    page.dialogs.elements.productTitleUP.val(product.title);
+                    page.dialogs.elements.productPriceUp.val(product.price);
+                    page.dialogs.elements.productUnitUp.val(product.unit);
+
+
+
+                    page.dialogs.elements.categorySelectUpdate.val(product.category.id);
+
+
+                    page.dialogs.commands.loadImageToCanvasUpdate(null, "", avatar.fileUrl);
+
+                    page.dialogs.elements.modalUpdate.modal('show');
+
+                    page.dialogs.elements.errorUpdateArea.empty();
+
+                } else {
+                    alert('Customer not found');
+                }
+
+            })
+            page.commands.clearForm();
+        });
+
+
+    }
+
+    page.commands.showDeleteConfirm = () => {
+
+        App.SweetAlert.showDeleteConfirmDialog()
+            .then((result) => {
+                if (result.isConfirmed) {
+                    page.commands.deleteProduct();
+                }
+            });
+    }
+
+    page.dialogs.commands.loadImageToCanvas = (imageFile, fileType, imageUrl) => {
+        page.dialogs.elements.imagePreview.css("display", "");
+        page.dialogs.elements.wrapper.addClass("active");
+        page.dialogs.elements.wrapperContent.css("opacity", 0);
+
+        let imageObj = new Image();
+
+        imageObj.onload = function () {
+            page.dialogs.elements.contextCreate.canvas.width = imageObj.width;
+            page.dialogs.elements.contextCreate.canvas.height = imageObj.height;
+            page.dialogs.elements.contextCreate.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+
+        };
+
+        if (fileType === "BINARY") {
+            imageObj.src = URL.createObjectURL(imageFile);
+        } else {
+            imageObj.src = imageUrl;
+        }
+    }
+    page.dialogs.commands.loadImageToCanvasUpdate = (imageFile, fileType, imageUrl) => {
+        page.dialogs.elements.imagePreview.css("display", "");
+        page.dialogs.elements.wrapper.addClass("active");
+        page.dialogs.elements.wrapperContent.css("opacity", 0);
+
+        let imageObj = new Image();
+
+        imageObj.onload = function () {
+            page.dialogs.elements.contextUpdate.canvas.width = imageObj.width;
+            page.dialogs.elements.contextUpdate.canvas.height = imageObj.height;
+            page.dialogs.elements.contextUpdate.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+
+        };
+
+        if (fileType === "BINARY") {
+            imageObj.src = URL.createObjectURL(imageFile);
+        } else {
+            imageObj.src = imageUrl;
+        }
+    }
+
+    page.dialogs.commands.changeImagePreviewCreate = () => {
+        let imageFile = page.dialogs.elements.imageFileCreate[0].files[0];
+
+
+        if (imageFile) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(imageFile);
+
+            reader.onload = function (e) {
+                if (e.target.readyState === FileReader.DONE) {
+                    page.dialogs.commands.loadImageToCanvas(imageFile, "BINARY", null);
+                }
+            }
+        } else {
+            page.dialogs.elements.clearImagePreview();
+        }
+    }
+    page.dialogs.commands.changeImagePreviewUpdate = () => {
+        let imageFile = page.dialogs.elements.imageFileUpdate[0].files[0];
+
+
+        if (imageFile) {
+            let reader = new FileReader();
+
+            reader.readAsDataURL(imageFile);
+
+            reader.onload = function (e) {
+                if (e.target.readyState === FileReader.DONE) {
+                    page.dialogs.commands.loadImageToCanvasUpdate(imageFile, "BINARY", null);
+                }
+            }
+        } else {
+            page.dialogs.elements.clearImagePreview();
+        }
+    }
+
+    page.dialogs.commands.createProduct = () => {
+        // page.commands.showLoadingSpinner();
+        page.elements.loader.removeClass("hide");
+        page.dialogs.elements.btnCreate.prop('disabled', true);
+
+
+        let formData = new FormData();
+        formData.append("title", page.dialogs.elements.productTitle.val().toString());
+        formData.append("price", page.dialogs.elements.productPrice.val().toString());
+        formData.append("unit", page.dialogs.elements.productUnit.val().toString());
+        formData.append("categoryId", page.dialogs.elements.categorySelectCreate.val());
+        formData.append("avatar", page.dialogs.elements.imageFileCreate[0].files[0]);
+
+        $.ajax({
+            type: "POST",
+            contentType: false,
+            cache: false,
+            processData: false,
+            url: page.url.doCreate,
+            data: formData
+        }).done((data) => {
+            product = data;
+            avatar = product.avatar;
+            let price = product.price.toLocaleString('vi', {style: 'currency', currency: 'VND'});
+            page.commands.addRow(price);
+            page.commands.getAllProduct(1,10);
+            App.SweetAlert.showSuccessAlert("Tạo món thành công");
+            page.dialogs.elements.modalCreate.modal('hide');
+            page.commands.handleImagePopup();
+            // page.commands.hideLoadingSpinner();
+            page.dialogs.elements.clearImagePreview()
+            page.dialogs.elements.frmCreateCustomer.trigger("reset");
+        }).fail((err) => {
+            App.SweetAlert.showErrorAlert(err.responseJSON.message);
+        }).always(function () {
+
+            page.elements.loader.addClass("hide");
+            page.dialogs.elements.btnCreate.prop('disabled', false);
+        });
+    }
+
+    page.dialogs.commands.updateProduct = () => {
+
+        page.elements.loader.removeClass("hide");
+        page.dialogs.elements.btnUpdate.prop('disabled', true);
+
+        let formData = new FormData();
+        formData.append("title", page.dialogs.elements.productTitleUP.val().toString());
+        formData.append("price", page.dialogs.elements.productPriceUp.val().toString());
+        formData.append("unit", page.dialogs.elements.productUnitUp.val().toString());
+        formData.append("categoryId", page.dialogs.elements.categorySelectUpdate.val());
+
+        if (page.dialogs.elements.imageFileUpdate[0].files[0] != null) {
+            formData.append("avatar", page.dialogs.elements.imageFileUpdate[0].files[0]);
+        }
+
+        $.ajax({
+            type: "PATCH",
+            contentType: false,
+            cache: false,
+            processData: false,
+            url: page.url.doUpdate + '/' + productId,
+            data: formData
+        }).done((data) => {
+            product = data;
+            avatar = product.avatar;
+            let price = product.price.toLocaleString('vi', {style: 'currency', currency: 'VND'});
+            page.commands.replace(productId, price);
+
+            App.SweetAlert.showSuccessAlert("Sửa đổi thành công");
+
+            page.dialogs.elements.modalUpdate.modal('hide');
+            page.commands.handleImagePopup();
+            page.commands.showUpdateModal();
+            page.dialogs.elements.clearImagePreview()
+            page.dialogs.elements.frmUpdateCustomer.trigger("reset");
+
+        }).fail((err) => {
+            App.SweetAlert.showErrorAlert(err.responseJSON.message);
+        }).always(function () {
+            page.elements.loader.addClass("hide");
+            page.dialogs.elements.btnUpdate.prop('disabled', false);
+        });
+    }
+
+    page.commands.deleteProduct = () => {
+        page.elements.loader.removeClass("hide");
+
+        $.ajax({
+            type: "DELETE",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            url: page.url.doDelete + '/' + product.id,
+        }).done((data) => {
+
+            App.SweetAlert.showSuccessAlert("Xoá món thành công");
+
+            $("#tr_" + product.id).remove();
+
+            page.commands.handleImagePopup();
+            page.commands.getAllProduct(1, 10);
+
+        }).fail(function (jqXHR) {
+            App.SweetAlert.showErrorAlert(jqXHR.responseJSON.message);
+        }).always(function () {
+            page.elements.loader.addClass("hide");
+        });
+    }
+
+    page.commands.handleImagePopup = () => {
+
+        $('.image-popup-vertical-fit').magnificPopup({
+            type: 'image',
+            closeOnContentClick: true,
+            mainClass: 'mfp-img',
+            image: {
+                verticalFit: true
+            },
+            gallery: {
+                enabled: true
+            }
+        });
+
+        $('.popup-youtube, .popup-vimeo, .popup-gmaps').magnificPopup({
+            disableOn: 700,
+            type: 'iframe',
+            mainClass: 'mfp-fade',
+            removalDelay: 160,
+            preloader: false,
+            fixedContentPos: false
+        });
+    }
+
+    page.commands.getSearchProduct = () => {
+        let searchProduct =page.dialogs.elements.searcheProduct.val();
+        page.elements.frmListProduct.empty();
+        if (searchProduct === "") {
+            page.commands.getAllProduct(1,10);
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: page.url.getProductByName + "/" + searchProduct
+            })
+                .done((data) => {
+
+                    data.forEach(item => {
+                        product = new Product(item.id, item.title, item.price, item.unit,item.category.title);
+                        avatar = item.avatar;
+                        price = product.price.toLocaleString('vi', {style: 'currency', currency: 'VND'});
+                        page.commands.addRow(price);
+                    })
+                    page.commands.displayPagination(data.totalPages, data.number + 1);
+                    page.commands.handleImagePopup();
+                    page.commands.showUpdateModal();
+                    page.dialogs.elements.clearImagePreview()
+                    page.dialogs.elements.frmUpdateCustomer.trigger("reset");
+                })
+        }
+
+    }
+
+
+    page.dialogs.elements.clearImagePreview = () => {
+        page.dialogs.elements.imageFileCreate.val("");
+        page.dialogs.elements.imageFileUpdate.val("");
+        page.dialogs.elements.imagePreview.css("display", "none");
+        page.dialogs.elements.wrapper.removeClass("active");
+        page.dialogs.elements.wrapperContent.css("opacity", 1);
+    }
+
+    page.commands.clearForm = () => {
+        $('.btnClose').on('click', () => {
+            page.dialogs.elements.clearImagePreview();
+
+            $("#mdCreate .modal-alert-danger").removeClass("show").addClass("hide").empty();
+            $("#frmCreateProduct input.error").removeClass("error");
+            page.dialogs.elements.frmCreateCustomer.trigger("reset");
+
+            $("#mdUpdate .modal-alert-danger").removeClass("show").addClass("hide").empty();
+            $("#frmUpdateProduct input.error").removeClass("error");
+            page.dialogs.elements.frmUpdateCustomer.trigger("reset");
+        })
+    }
+
+    page.dialogs.elements.frmCreateCustomer.validate({
+        rules: {
+            productTitle: {
+                required: true,
+            },
+            productPrice: {
+                required: true,
+                min: 100,
+                max: 999999999,
+                number: true
+            },
+            productUnit: {
+                required: true
+            },
+            categorySelectCreate: {
+                required: true,
+                number: true
+
+            }
+        },
+        messages: {
+            productTitle: {
+                required: "Vui lòng nhập tên sản phẩm.",
+            },
+            productPrice: {
+                required: "Vui lòng nhập giá.",
+                number: "Giá sản phẩm phải là số.",
+                min: "Giá sản phẩm tối thiểu là 100 VNĐ.",
+                max: "Giá sản phẩm tối đa là 999.999.999 VNĐ."
+            },
+            productUnit: {
+                required: "Vui lòng nhập loại sản phẩm."
+            },
+            categorySelectCreate: {
+                required: "Vui lòng nhập loại sản phâ.",
+                number: "mã category không đúng. vui lòng chọn lại."
+            }
+        },
+        errorLabelContainer: "#mdCreate .modal-alert-danger",
+        errorPlacement: function (error, element) {
+            error.appendTo("#mdCreate .modal-alert-danger");
+        },
+        showErrors: function (errorMap, errorList) {
+            if (this.numberOfInvalids() > 0) {
+                $("#mdCreate .modal-alert-danger").removeClass("hide").addClass("show");
+            } else {
+                $("#mdCreate .modal-alert-danger").removeClass("show").addClass("hide").empty();
+                $("#frmCreateProduct input.error").removeClass("error");
+            }
+            this.defaultShowErrors();
+        },
+        submitHandler: function () {
+            page.dialogs.commands.createProduct();
+        }
+    })
+
+    page.dialogs.elements.frmUpdateCustomer.validate({
+        rules: {
+            productTitleUP: {
+                required: true,
+            },
+            productPriceUp: {
+                required: true,
+                min: 100,
+                max: 999999999,
+                number: true
+            },
+            productQuantityUp: {
+                required: true,
+                min: 1,
+                max: 999,
+                number: true
+            },
+            productUnitUp: {
+                required: true
+            },
+            categorySelectUpdate: {
+                required: true,
+                number: true
+
+            }
+        },
+        messages: {
+            productTitleUP: {
+                required: "Vui lòng nhập tên sản phẩm.",
+            },
+            productPriceUp: {
+                required: "Vui lòng nhập giá.",
+                number: "Giá sản phẩm phải là số.",
+                min: "Giá sản phẩm tối thiểu là 100 VNĐ.",
+                max: "Giá sản phẩm tối đa là 999.999.999 VNĐ."
+            },
+            productQuantityUpUp: {
+                required: "Vui lòng nhập số lượng sản phẩm.",
+                number: "Số lượng sản phẩm phải là số.",
+                min: "Số lượng sản phẩm tối thiểu là 1.",
+                max: "Số lượng sản phẩm tối đa là 999."
+            },
+            productUnitUp: {
+                required: "Vui lòng nhập loại sản phẩm."
+            },
+            categorySelectUpdate: {
+                required: "Vui lòng nhập loại sản phẩm.",
+                number: "Mã category không đúng. vui lòng chọn lại."
+            }
+        },
+        errorLabelContainer: "#mdUpdate .modal-alert-danger",
+        errorPlacement: function (error, element) {
+            error.appendTo("#mdUpdate .modal-alert-danger");
+        },
+        showErrors: function (errorMap, errorList) {
+            if (this.numberOfInvalids() > 0) {
+                $("#mdUpdate .modal-alert-danger").removeClass("hide").addClass("show");
+            } else {
+                $("#mdUpdate .modal-alert-danger").removeClass("show").addClass("hide").empty();
+                $("#frmUpdateProduct input.error").removeClass("error");
+            }
+            this.defaultShowErrors();
+        },
+        submitHandler: function () {
+            page.dialogs.commands.updateProduct();
+        }
+    })
+
+    page.initializeControlEvent = () => {
+        page.dialogs.elements.btnCreate.on("click", function () {
+            page.dialogs.elements.frmCreateCustomer.trigger('submit');
+
+        });
+
+        page.dialogs.elements.btnUpdate.on("click", function () {
+            // page.dialogs.commands.createProduct();
+            page.dialogs.elements.frmUpdateCustomer.trigger('submit');
+        });
+
+        page.elements.frmListProduct.on("click", ".delete", function () {
+            // page.elements.currentRow.val($(this).closest("tr").attr("id"));
+            product.id = $(this).data('id');
+            page.commands.showDeleteConfirm();
+        });
+
+        page.dialogs.elements.divImagePreviewCreate.on("click", function () {
+            page.dialogs.elements.imageFileCreate.trigger("click");
+
+        });
+        page.dialogs.elements.divImagePreviewUpdate.on("click", function () {
+            page.dialogs.elements.imageFileUpdate.trigger("click");
+        });
+
+
+        page.dialogs.elements.imageFileCreate.on("change", function () {
+            page.dialogs.commands.changeImagePreviewCreate();
+        });
+        page.dialogs.elements.imageFileUpdate.on("change", function () {
+            page.dialogs.commands.changeImagePreviewUpdate();
+        });
+
+        page.dialogs.elements.btnClearImagePreview.on("click", function () {
+            page.dialogs.elements.clearImagePreview();
+        });
+
+        page.commands.handleImagePopup();
+
+        page.dialogs.elements.btnSearchProduct.on('click', function () {
+            page.commands.getSearchProduct();
+        })
+
+    }
+
+
+    page.loadData = () => {
+        page.commands.getAllProduct(1, 10);
+    }
+
+    $(() => {
+        page.loadData();
+        page.initializeControlEvent();
+
+    })
+
+
+</script>
+
+</body>
+</html>
