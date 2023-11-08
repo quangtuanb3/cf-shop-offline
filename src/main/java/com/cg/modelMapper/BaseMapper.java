@@ -1,8 +1,13 @@
 package com.cg.modelMapper;
 
+import com.cg.model.Product;
+import com.cg.product.dto.ProductResult;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class BaseMapper<DTO, Entity> {
 
@@ -24,6 +29,10 @@ public abstract class BaseMapper<DTO, Entity> {
 
     public Entity toEntity(DTO dto) {
         return modelMapper.map(dto, entityClass);
+    }
+
+    public List<DTO> toDTOList(List<Entity> entities) {
+        return entities.stream().map(this::toDTO).collect(Collectors.toList());
     }
 }
 

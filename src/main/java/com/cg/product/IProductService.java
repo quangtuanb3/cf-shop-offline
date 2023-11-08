@@ -12,13 +12,13 @@ import java.util.List;
 public interface IProductService {
     ProductResult createProduct(CreationProductParam creationProductParam);
 
-    List<ProductResult> findAllProductDTO();
+    List<ProductResult> findAllProductResult();
 
     Product findById(Long id);
 
     ProductResult update(String productId, UpdateProductParam updateProductParam);
 
-    void deleteByIdTrue(Product product);
+    void deleteById(Long id);
 
     List<ProductResult> findAllByCategoryLike(Long categoryId);
 

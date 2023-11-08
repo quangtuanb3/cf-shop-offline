@@ -17,84 +17,78 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
     private final ProductRepository productRepository;
-
     private final ProductAvatarRepository productAvatarRepository;
-
     private final IUploadService uploadService;
-
     private final UploadUtils uploadUtils;
-
     private final ValidateUtils validateUtils;
-    private final ProductMapper productMapper;
+    private final ProductResultMapper productResultMapper;
     private final CategoryRepository categoryRepository;
+    private final CreationProductParamMapper creationProductParamMapper;
+    private final UpdateProductParamMapper updateProductParamMapper;
 
 
     public List<Product> findAll() {
         return productRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Product findById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found"));
     }
 
-
-
     @Override
+    @Transactional
     public ProductResult createProduct(CreationProductParam creationProductParam) {
         if (!validateUtils.isNumberValid(creationProductParam.getCategoryId())) {
             throw new DataInputException("Mã danh mục không hợp lệ");
         }
 
         Long idCategory = Long.parseLong(creationProductParam.getCategoryId());
-        Category category = categoryRepository.findByIdAndDeletedFalse(idCategory)
-                .orElseThrow(() -> {
-                    throw new DataInputException("Mã danh mục không tồn tại");
-                });
+
+        categoryRepository.findByIdAndDeletedFalse(idCategory)
+                .orElseThrow(() -> new DataInputException("Mã danh mục không tồn tại"));
+
         ProductAvatar productAvatar = new ProductAvatar();
+
         productAvatarRepository.save(productAvatar);
 
         uploadAndSaveProductImage(creationProductParam, productAvatar);
 
-        Product product = creationProductParam.toProduct(category);
-
+        Product product = creationProductParamMapper.toEntity(creationProductParam);
         product.setProductAvatar(productAvatar);
         productRepository.save(product);
-
-        return  productMapper.toDTO(product);
+        return productResultMapper.toDTO(product);
     }
 
     @Override
-    public List<ProductResult> findAllProductDTO() {
+    @Transactional(readOnly = true)
+    public List<ProductResult> findAllProductResult() {
         List<Product> entities = productRepository.findAllByDeletedIsFalse();
-        return productMapper.toDTOList(entities);
+        return productResultMapper.toDTOList(entities);
     }
 
     @Override
+    @Transactional
     public ProductResult update(String productIdStr, UpdateProductParam updateProductParam) {
         if (!validateUtils.isNumberValid(productIdStr)) {
             throw new DataInputException("Mã sản phẩm không hợp lệ");
         }
 
         Long productId = Long.parseLong(productIdStr);
-        Product productDB = productRepository.findByIdAndDeletedFalse(productId).orElseThrow(()->{
-        throw new DataInputException("ma san pham k ton tai");
-    });
-
-
-
+        Product productDB = productRepository.findByIdAndDeletedFalse(productId)
+                .orElseThrow(() -> new DataInputException("ma san pham k ton tai"));
 
         if (!validateUtils.isNumberValid(updateProductParam.getCategoryId())) {
             throw new DataInputException("Mã danh mục không hợp lệ");
@@ -102,10 +96,10 @@ public class ProductServiceImpl implements IProductService {
 
         Long idCategory = Long.parseLong(updateProductParam.getCategoryId());
         Category category = categoryRepository.findByIdAndDeletedFalse(idCategory)
-                .orElseThrow(()-> new ResourceNotFoundException("Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
 
         if (updateProductParam.getAvatar() == null) {
-            Product product = updateProductParam.toProductChangeImage(category);
+            Product product = updateProductParamMapper.toEntity(updateProductParam);
             product.setId(productDB.getId());
             product.setProductAvatar(productDB.getProductAvatar());
             productRepository.save(product);
@@ -113,63 +107,71 @@ public class ProductServiceImpl implements IProductService {
         }
         ProductAvatar productAvatar = new ProductAvatar();
         productAvatarRepository.save(productAvatar);
+        Product productUpdate = updateProductParamMapper.toEntity(updateProductParam);
 
-        uploadAndSaveProductImage(updateProductParam.toDTO(), productAvatar);
+        uploadAndSaveProductImage(new CreationProductParam()
+                .setAvatar(updateProductParam.getAvatar()), productAvatar);
 
-        Product productUpdate = updateProductParam.toProductChangeImage(category);
         productUpdate.setId(productId);
         productUpdate.setProductAvatar(productAvatar);
         productRepository.save(productUpdate);
-        return productMapper.toDTO(productUpdate);
+        return productResultMapper.toDTO(productUpdate);
+    }
+
+
+    @Transactional
+    public void deleteById(Long id) {
+        findById(id).setDeleted(true);
     }
 
     @Override
-    public void deleteByIdTrue(Product product) {
-        product.setDeleted(true);
-        productRepository.save(product);
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<ProductResult> findAllByCategoryLike(Long categoryId) {
-        return productRepository.findAllByCategoryLike(categoryId);
+        return productResultMapper.toDTOList(productRepository.findAllByCategoryId(categoryId));
     }
 
     @Override
     public List<ProductResult> findProductByName(String keySearch) {
-        return productRepository.findProductByName(keySearch);
+        return productResultMapper.toDTOList(productRepository.findProductByTitle(keySearch));
     }
 
     @Override
     public List<ProductResult> findAllByCategoryLikeAndAndTitleLike(Long categoryId, String keySearch) {
-        return productRepository.findAllByCategoryLikeAndAndTitleLike(categoryId, keySearch);
+        return productResultMapper.toDTOList(productRepository.findAllByCategoryIdAndTitleLike(categoryId, keySearch));
     }
 
     @Override
     public Page<ProductResult> findAllProductDTOPage(Pageable pageable) {
-        return productRepository.findAllProductDTOPage(pageable);
+        Page<Product> result = productRepository.findAll(pageable);
+        return result.map(productResultMapper::toDTO);
     }
 
     @Override
+    @Transactional
     public Product save(Product product) {
-        return null;
+        return productRepository.save(product);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductResult findByIdAndDeletedFalse(String productIdStr) {
         if (!validateUtils.isNumberValid(productIdStr)) {
             throw new DataInputException("Mã sản phẩm không hợp lệ");
         }
         Long productId = Long.valueOf(productIdStr);
-        Product entity = productRepository.findByIdAndDeletedFalse(productId).orElseThrow(() -> new ResourceNotFoundException("Not found!"));
-        return productMapper.toDTO(entity);
+        Product entity = productRepository.findByIdAndDeletedFalse(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found!"));
+        return productResultMapper.toDTO(entity);
     }
 
-    private void uploadAndSaveProductImage(CreationProductParam creationProductParam, ProductAvatar productAvatar) {
+    @Transactional
+    public void uploadAndSaveProductImage(CreationProductParam creationProductParam, ProductAvatar productAvatar) {
         try {
-            Map uploadResult = uploadService.uploadImage(creationProductParam.getAvatar(), uploadUtils.buildImageUploadParams(productAvatar));
+            Map uploadResult = uploadService.uploadImage(creationProductParam.getAvatar(),
+                    uploadUtils.buildImageUploadParams(productAvatar));
+
             String fileUrl = (String) uploadResult.get("secure_url");
             String fileFormat = (String) uploadResult.get("format");
-
             productAvatar.setFileName(productAvatar.getId() + "." + fileFormat);
             productAvatar.setFileUrl(fileUrl);
             productAvatar.setFileFolder(UploadUtils.IMAGE_UPLOAD_FOLDER);

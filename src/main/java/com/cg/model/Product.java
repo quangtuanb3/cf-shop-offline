@@ -28,6 +28,7 @@ public class Product extends BaseEntity {
 
     @Column(precision = 10, scale = 0, nullable = false)
     private BigDecimal price;
+
     private String unit;
 
     @Setter(AccessLevel.NONE)
@@ -47,11 +48,7 @@ public class Product extends BaseEntity {
     private List<OrderDetail> orderDetails;
 
     @OneToOne
-    @JoinColumn(name = "product_avatar_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "product_avatar_id",foreignKey = @ForeignKey(name = "fk_product_productAvatar"), referencedColumnName = "id", nullable = false)
     private ProductAvatar productAvatar;
 
-
-    public ProductResult toProductDTO() {
-        return null;
-    }
 }
