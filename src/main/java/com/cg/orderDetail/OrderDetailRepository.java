@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail,Long> {
 
-    @Query("SELECT NEW com.cg.orderDetail.DTO.OrderDetailByTableResDTO (" +
+    @Query("SELECT NEW com.cg.orderDetail.dto.OrderDetailByTableResDTO (" +
             "od.id, " +
             "od.product.id, " +
             "od.product.title, " +
@@ -38,7 +38,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail,Long> {
     List<OrderDetail> findAllByOrder(Order order);
 
 
-    @Query("SELECT NEW com.cg.orderDetail.DTO.OrderDetailProductUpResDTO (" +
+    @Query("SELECT NEW com.cg.orderDetail.dto.OrderDetailProductUpResDTO (" +
             "od.id, " +
             "od.product.id, " +
             "od.product.title, " +

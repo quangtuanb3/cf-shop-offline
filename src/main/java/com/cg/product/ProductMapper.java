@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProductMapper {
-
     public ProductResult toDTO(Product entity){
         return new ProductResult()
                 .setId(String.valueOf(entity.getId()))

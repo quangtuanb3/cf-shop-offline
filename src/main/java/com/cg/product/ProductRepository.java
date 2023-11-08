@@ -1,5 +1,6 @@
 package com.cg.product;
 
+import com.cg.model.Category;
 import com.cg.model.Product;
 import com.cg.product.dto.ProductResult;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,20 +20,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdAndDeletedFalse(Long id);
     List<Product> findAllByDeletedIsFalse();
 
-    @Query("SELECT NEW com.cg.product.dto.ProductDTO (" +
-            "pr.id, " +
-            "pr.title, " +
-            "pr.price, " +
-            "pr.unit, " +
-            "pr.category, " +
-            "pr. productAvatar " +
-            ") " +
+//    String id, String title, BigDecimal price, String unit, Category category, ProductAvatar avatar
+    @Query("SELECT NEW com.cg.product.dto.ProductResult(pr.id, pr.title, pr.price, pr.unit, pr.category, pr.productAvatar ) " +
             "From Product AS pr " +
             "WHERE pr.category.id = :categoryId " +
             "AND pr.deleted = false ")
     List<ProductResult> findAllByCategoryLike(Long categoryId);
 
-    @Query("SELECT NEW com.cg.product.DTO.ProductDTO (" +
+    @Query("SELECT NEW com.cg.product.dto.ProductResult (" +
             "pro.id, " +
             "pro.title, " +
             "pro.price, " +
@@ -45,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<ProductResult> findProductByName(String keySearch);
 
 
-    @Query("SELECT NEW com.cg.product.DTO.ProductDTO (" +
+    @Query("SELECT NEW com.cg.product.dto.ProductResult (" +
             "pro.id, " +
             "pro.title, " +
             "pro.price, " +
@@ -59,7 +55,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     )
     List<ProductResult> findAllByCategoryLikeAndAndTitleLike(@Param("categoryId") Long categoryId, @Param("keySearch") String keySearch);
 
-    @Query("SELECT NEW com.cg.product.DTO.ProductDTO ( " +
+    @Query("SELECT NEW com.cg.product.dto.ProductResult ( " +
             "pro.id, " +
             "pro.title, " +
             "pro.price, " +
