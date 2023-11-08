@@ -39,7 +39,7 @@ public class StaffServiceImpl implements IStaffService {
     private final UploadUtils uploadUtils;
     private final StaffAvatarRepository staffAvatarRepository;
     private final LocationRegionRepository locationRegionRepository;
-    private final IStaffService staffService;
+//    private final IStaffService staffService;
     private final IUserService userService;
     private final IRoleService roleService;
     private final StaffMapper staffMapper;
@@ -172,7 +172,7 @@ public class StaffServiceImpl implements IStaffService {
     @Transactional
     public Staff update(Long staffId, UpdateStaffParam updateStaffParam) {
         MultipartFile file = updateStaffParam.getStaffAvatar();
-        Staff staff = staffService.findById(staffId);
+        Staff staff = this.findById(staffId);
         Long locationRegionId = staff.getLocationRegion().getId();
         UpdateLocationRegionParam updateLocationRegionParam = updateStaffParam.getLocationRegion();
         LocationRegion locationRegion = updateLocationRegionParam.toLocationRegionUp(locationRegionId);

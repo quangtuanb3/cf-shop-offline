@@ -24,15 +24,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
 public class OrderAPI {
-
     private final IOrderService orderService;
     private final IOrderDetailService orderDetailService;
-
     private final ITableOrderService tableOrderService;
     private final IUserService userService;
-
     private final AppUtils appUtils;
-
 
     @GetMapping("/table/{tableId}")
     public ResponseEntity<?> getOrderByTableId(@PathVariable("tableId") String tableIdStr) {

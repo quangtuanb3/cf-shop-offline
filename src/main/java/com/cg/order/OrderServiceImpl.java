@@ -45,7 +45,7 @@ public class OrderServiceImpl implements IOrderService {
     private final UserServiceImpl userService;
     private final IProductService productService;
     private final ITableOrderService tableOrderService;
-    private final IOrderService orderService;
+//    private final IOrderService orderService;
 
     public List<Order> findAll() {
         return orderRepository.findAll();
@@ -114,7 +114,7 @@ public class OrderServiceImpl implements IOrderService {
 
         Product product = productService.findById(orderUpReqDTO.getProductId());
 
-        List<Order> orders = orderService.findByTableOrderAndPaid(tableOrder, false);
+        List<Order> orders = this.findByTableOrderAndPaid(tableOrder, false);
 
         if (orders.size() == 0) {
             throw new DataInputException("Bàn này không có hoá đơn, vui lòng kiểm tra lại thông tin");
@@ -183,8 +183,8 @@ public class OrderServiceImpl implements IOrderService {
             throw new DataInputException("Bàn chuyển và bàn chuyển là một xin vui lòng kiểm tra lại");
         }
 
-        List<Order> orderEmptys = orderService.findByTableOrderAndPaid(tableOrderEmpty, false);
-        List<Order> orderBusys = orderService.findByTableOrderAndPaid(tableOrderBusy, false);
+        List<Order> orderEmptys = this.findByTableOrderAndPaid(tableOrderEmpty, false);
+        List<Order> orderBusys = this.findByTableOrderAndPaid(tableOrderBusy, false);
 
         if (orderBusys.size() == 0) {
             throw new DataInputException("Bàn chuyển này không có hoá đơn, vui lòng kiểm tra lại thông tin");
