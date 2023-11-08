@@ -2,7 +2,7 @@ package com.cg.user;
 
 
 import com.cg.exception.ResourceNotFoundException;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import com.cg.user.dto.UserParam;
 import com.cg.user.dto.UserResult;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +73,6 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(()-> new ResourceNotFoundException("Not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found!"));
     }
 }

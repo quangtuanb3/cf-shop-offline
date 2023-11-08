@@ -6,7 +6,7 @@ import com.cg.locationRegion.ILocationRegionService;
 import com.cg.model.LocationRegion;
 import com.cg.model.Role;
 import com.cg.model.Staff;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import com.cg.role.IRoleService;
 import com.cg.locationRegion.dto.UpdateLocationRegionParam;
 import com.cg.staff.dto.CreationStaffParam;

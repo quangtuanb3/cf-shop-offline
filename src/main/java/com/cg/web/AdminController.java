@@ -1,19 +1,15 @@
 package com.cg.web;
 
-import com.cg.exception.DataInputException;
 import com.cg.model.Role;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import com.cg.user.IUserService;
 import com.cg.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor

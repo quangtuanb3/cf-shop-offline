@@ -1,13 +1,9 @@
 package com.cg.model;
 
 
-
 import com.cg.category.CategoryMapper;
 import com.cg.product.dto.ProductResult;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -34,16 +30,24 @@ public class Product extends BaseEntity {
     private BigDecimal price;
     private String unit;
 
-
-    @ManyToOne
-    @JoinColumn(name = "category_id",referencedColumnName = "id",nullable = false)
+    @Setter(AccessLevel.NONE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "fk_product_category"))
     private Category category;
+
+    @Column(name = "category_id", insertable = false, updatable = false)
+    private Long categoryId;
+
+    public Product setCategoryId(Long categoryId) {
+        this.category = new Category(this.categoryId = categoryId);
+        return this;
+    }
 
     @OneToMany(mappedBy = "product")
     private List<OrderDetail> orderDetails;
 
     @OneToOne
-    @JoinColumn(name = "product_avatar_id",referencedColumnName = "id" ,  nullable = false)
+    @JoinColumn(name = "product_avatar_id", referencedColumnName = "id", nullable = false)
     private ProductAvatar productAvatar;
 
 

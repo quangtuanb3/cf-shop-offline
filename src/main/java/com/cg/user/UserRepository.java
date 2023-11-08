@@ -1,6 +1,6 @@
 package com.cg.user;
 
-import com.cg.model.User;
+import com.cg.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

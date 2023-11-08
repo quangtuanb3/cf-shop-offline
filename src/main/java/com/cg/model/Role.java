@@ -1,6 +1,7 @@
 package com.cg.model;
 
-import com.cg.model.enums.ERole;
+import com.cg.model.user.UserRole;
+import com.cg.model.user.User;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -25,10 +26,11 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private ERole name;
+    private UserRole name;
 
     @OneToMany(targetEntity = User.class, fetch = FetchType.EAGER)
     private List<User> users;
+
 
 
 }

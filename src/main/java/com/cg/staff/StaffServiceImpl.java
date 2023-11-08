@@ -7,6 +7,7 @@ import com.cg.exception.EmailExistsException;
 import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.*;
 import com.cg.locationRegion.dto.UpdateLocationRegionParam;
+import com.cg.model.user.User;
 import com.cg.staff.dto.CreationStaffParam;
 import com.cg.staff.dto.StaffResult;
 import com.cg.staff.dto.UpdateStaffParam;

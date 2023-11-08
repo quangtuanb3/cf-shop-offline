@@ -27,7 +27,7 @@ public class LocationRegion extends BaseEntity {
     @Column(name = "province_id")
     private String provinceId;
 
-    @Column(name = "province_name")
+    @Column(name = "province_name" ,columnDefinition = "JSON")
     private String provinceName;
 
     @Column(name = "district_id")

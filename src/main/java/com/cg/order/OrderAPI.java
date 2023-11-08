@@ -2,6 +2,7 @@ package com.cg.order;
 
 import com.cg.exception.DataInputException;
 import com.cg.model.*;
+import com.cg.model.user.User;
 import com.cg.order.dto.CreationOrderParam;
 import com.cg.order.dto.OrderUpChangeToTableReqDTO;
 import com.cg.order.dto.OrderUpChangeToTableResDTO;

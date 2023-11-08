@@ -11,10 +11,10 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name="categories")
 @Accessors(chain = true)
@@ -30,6 +30,9 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 
+    public Category(Long id) {
+        this.id=id;
+    }
 
     public CategoryResult toCategoryDTO() {
         return new CategoryResult()

@@ -1,12 +1,12 @@
-package com.cg.model.enums;
+package com.cg.model.user;
 
-public enum ERole {
+public enum UserRole {
     ROLE_ADMIN("ADMIN"),
     ROLE_STAFF("STAFF");
 
     private final String value;
 
-    ERole(String value) {
+    UserRole(String value) {
         this.value = value;
     }
 

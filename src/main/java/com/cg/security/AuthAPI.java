@@ -4,7 +4,8 @@ import com.cg.exception.DataInputException;
 import com.cg.exception.EmailExistsException;
 import com.cg.model.JwtResponse;
 import com.cg.model.Role;
-import com.cg.model.User;
+import com.cg.model.user.User;
+import com.cg.model.user.UserRole;
 import com.cg.service.jwt.JwtService;
 import com.cg.role.IRoleService;
 import com.cg.user.IUserService;
@@ -12,12 +13,14 @@ import com.cg.user.UserMapper;
 import com.cg.user.dto.UserParam;
 import com.cg.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.Valid;
 
 @RestController
@@ -34,10 +38,9 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthAPI {
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationProvider authenticationProvider;
     private final JwtService jwtService;
     private final IUserService userService;
-    private final IRoleService roleService;
     private final AppUtils appUtils;
     private final UserMapper userMapper;
 
@@ -54,9 +57,9 @@ public class AuthAPI {
             throw new EmailExistsException("Account already exists");
         }
 
-        Role role = roleService.findById(userParam.getRoleId());
+
         User entity = userMapper.toEntity(userParam);
-        entity.setRole(role);
+        entity.setRole(UserRole.ROLE_STAFF);
         try {
             userService.save(entity);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -67,9 +70,9 @@ public class AuthAPI {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserParam user) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
+            Authentication authentication = authenticationProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

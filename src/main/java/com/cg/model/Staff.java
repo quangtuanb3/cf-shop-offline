@@ -1,6 +1,6 @@
 package com.cg.model;
 
-import com.cg.staff.dto.StaffResult;
+import com.cg.model.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
 import java.util.List;
 
 @AllArgsConstructor
@@ -38,7 +33,7 @@ public class Staff extends BaseEntity {
     @JoinColumn(name = "location_region_id", referencedColumnName = "id", nullable = false)
     private LocationRegion locationRegion;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staff_avatar_id",referencedColumnName = "id",  nullable = false)
     private StaffAvatar staffAvatar;
 

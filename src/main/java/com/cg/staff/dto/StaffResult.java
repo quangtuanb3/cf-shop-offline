@@ -2,7 +2,7 @@ package com.cg.staff.dto;
 
 import com.cg.model.LocationRegion;
 import com.cg.model.StaffAvatar;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import lombok.*;
 import lombok.experimental.Accessors;
 

@@ -1,6 +1,6 @@
 package com.cg.role.dto;
 
-import com.cg.model.enums.ERole;
+import com.cg.model.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 public class RoleResult {
     private Long id;
     private String code;
-    private ERole name;
+    private UserRole name;
 
 //    public Role toRoleDTO() {
 //        return new Role()

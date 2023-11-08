@@ -1,9 +1,8 @@
 package com.cg.staff.dto;
 
-import com.cg.model.LocationRegion;
 import com.cg.model.Role;
 import com.cg.model.Staff;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

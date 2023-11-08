@@ -1,9 +1,7 @@
 package com.cg.staff;
 
-import com.cg.model.LocationRegion;
 import com.cg.model.Staff;
-import com.cg.model.StaffAvatar;
-import com.cg.model.User;
+import com.cg.model.user.User;
 import com.cg.staff.dto.StaffResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
