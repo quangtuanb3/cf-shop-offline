@@ -1,9 +1,6 @@
 package com.cg.user;
 
-import com.cg.model.Role;
-import com.cg.model.Staff;
 import com.cg.model.user.User;
-import com.cg.role.dto.RoleResult;
 import com.cg.user.dto.UserParam;
 import com.cg.user.dto.UserResult;
 import org.springframework.stereotype.Component;

@@ -17,12 +17,4 @@ public interface IUserService{
     UserResult create(UserParam creationParam);
 
     UserResult update(Long id, UserParam userParam);
-
-    Boolean existsByUsername(String username);
-
-    User save(User user);
-
-    User getByUsername(String username);
-
-    User findByUsername(String username);
 }

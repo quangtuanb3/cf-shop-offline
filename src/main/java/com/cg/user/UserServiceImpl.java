@@ -1,13 +1,13 @@
 package com.cg.user;
 
 
-import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.user.User;
 import com.cg.user.dto.UserParam;
 import com.cg.user.dto.UserResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.rananu.shared.exception.NotFoundException;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class UserServiceImpl implements IUserService {
     public User findById(Long id) {
         return userRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("user.exception.notFound"));
     }
 
     @Override
@@ -52,27 +52,5 @@ public class UserServiceImpl implements IUserService {
         User entity = findById(id);
         userMapper.transferFields(entity, userParam);
         return userMapper.toDTO(entity);
-    }
-
-    @Override
-    public Boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User getByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
-    }
-
-    @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found!"));
     }
 }
