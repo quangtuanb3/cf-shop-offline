@@ -69,7 +69,10 @@ public class ProductServiceImpl implements IProductService {
         Product product = creationProductParamMapper.toEntity(creationProductParam);
         product.setProductAvatar(productAvatar);
         productRepository.save(product);
-        return productResultMapper.toDTO(product);
+        ProductResult result = productResultMapper.toDTO(product);
+        result.setProductAvatarId(product.getProductAvatar().getId());
+        result.setProductAvatarUrl(product.getProductAvatar().getFileUrl());
+        return result;
     }
 
     @Override

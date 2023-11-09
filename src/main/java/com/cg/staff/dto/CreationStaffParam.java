@@ -3,6 +3,7 @@ package com.cg.staff.dto;
 import com.cg.model.Role;
 import com.cg.model.Staff;
 import com.cg.model.user.User;
+import com.cg.model.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,11 +39,11 @@ public class CreationStaffParam implements Validator {
                 .setPhone(phone);
     }
 
-    public User toUser(Role role) {
+    public User toUser() {
         return new User()
                 .setUsername(username)
-                .setPassword(password)
-                .setRole(role)
+                .setPasswordHash(password)
+                .setRole(UserRole.ROLE_STAFF)
                 ;
     }
 

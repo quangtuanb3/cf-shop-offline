@@ -38,11 +38,11 @@ public class AdminController {
     private void setModel(Model model) {
         String username = appUtils.getPrincipalUsername();
         User user = userService.findByUsername(username);
-        Role role = user.getRole();
-        String roleCode = role.getCode();
+//        Role role = user.getRole();
+//        String roleCode = role.getCode();
         username = username.substring(0, username.indexOf("@"));
         model.addAttribute("userName", username);
-        model.addAttribute("roleCode", roleCode);
+//        model.addAttribute("roleCode", roleCode);
     }
 
     @GetMapping("/products")

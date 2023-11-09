@@ -46,7 +46,6 @@ public class OrderServiceImpl implements IOrderService {
     private final UserServiceImpl userService;
     private final IProductService productService;
     private final ITableOrderService tableOrderService;
-//    private final IOrderService orderService;
 
     public List<Order> findAll() {
         return orderRepository.findAll();

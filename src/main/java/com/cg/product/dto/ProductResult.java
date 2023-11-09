@@ -23,5 +23,6 @@ public class ProductResult {
     private BigDecimal price;
     private String unit;
     private CategoryResult category;
-    private ProductAvatarResult avatar;
+    private String productAvatarId;
+    private String productAvatarUrl;
 }

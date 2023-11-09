@@ -156,7 +156,7 @@ public class StaffServiceImpl implements IStaffService {
         Role role = roleService.findById(creationStaffParam.getRoleId());
 
         try {
-            User user = userService.save(creationStaffParam.toUser(role));
+            User user = userService.save(creationStaffParam.toUser());
             Staff staff = creationStaffParam.toStaff();
             staff.setLocationRegion(locationRegion);
             staff.setStaffAvatar(staffAvatar);
