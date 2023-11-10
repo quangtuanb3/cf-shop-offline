@@ -1,20 +1,16 @@
 package com.cg.model;
 
 
-import com.cg.category.CategoryMapper;
-import com.cg.product.dto.ProductResult;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.List;
 
 
 @NoArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
 @Entity
 @Table(name = "products")
 @Accessors(chain = true)
@@ -39,13 +35,21 @@ public class Product extends BaseEntity {
     @Column(name = "category_id", insertable = false, updatable = false)
     private Long categoryId;
 
+    @Column(name = "product_avatar_url", insertable = false, updatable = false)
+    private String productAvatarUrl;
+
+    @OneToOne
+    @JoinColumn(name = "product_avatar_id", foreignKey = @ForeignKey(name = "fk_product_productAvatar"), referencedColumnName = "id", nullable = false)
+    private ProductAvatar productAvatar;
+
     public Product setCategoryId(Long categoryId) {
         this.category = new Category(this.categoryId = categoryId);
         return this;
     }
 
-    @OneToOne
-    @JoinColumn(name = "product_avatar_id",foreignKey = @ForeignKey(name = "fk_product_productAvatar"), referencedColumnName = "id", nullable = false)
-    private ProductAvatar productAvatar;
-
+    public Product setProductAvatar(ProductAvatar productAvatar) {
+        this.productAvatarUrl = productAvatar.getFileUrl();
+        this.productAvatar = productAvatar;
+        return this;
+    }
 }

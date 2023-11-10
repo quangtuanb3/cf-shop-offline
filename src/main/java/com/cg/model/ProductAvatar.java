@@ -1,15 +1,13 @@
 package com.cg.model;
 
 
-import com.cg.productAvatar.dto.ProductAvatarResult;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
 
 
 @NoArgsConstructor
@@ -41,24 +39,4 @@ public class ProductAvatar extends BaseEntity {
     @Column(name = "cloud_id")
     private String cloudId;
 
-
-    public ProductAvatarResult toProductAvatarResDTO() {
-        return new ProductAvatarResult()
-                .setId(id)
-                .setFileName(fileName)
-                .setFileFolder(fileFolder)
-                .setFileUrl(fileUrl)
-                .setCloudId(cloudId)
-                ;
-    }
-
-    public ProductAvatarResult toProductAvatarDTO() {
-        return new ProductAvatarResult()
-                .setId(id)
-                .setFileName(fileName)
-                .setFileFolder(fileFolder)
-                .setFileUrl(fileUrl)
-                .setCloudId(cloudId)
-                ;
-    }
 }

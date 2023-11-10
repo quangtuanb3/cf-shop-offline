@@ -1,26 +1,24 @@
 package com.cg.product;
 
 import com.cg.category.CategoryServiceImpl;
-import com.cg.exception.DataInputException;
-import com.cg.exception.ResourceNotFoundException;
-import com.cg.model.Category;
-import com.cg.model.Product;
 import com.cg.product.dto.*;
 import com.cg.utils.AppUtils;
 import com.cg.utils.ValidateUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.grammars.hql.HqlParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import vn.rananu.shared.annotation.RananuBody;
 
 import java.util.List;
-import java.util.Optional;
 
-@RestController
+//@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/products")
 public class ProductAPI {
     private final IProductService productService;
@@ -29,101 +27,63 @@ public class ProductAPI {
     private final AppUtils appUtils;
 
     @GetMapping
-    public ResponseEntity<?> showProducts() {
-        return new ResponseEntity<>(productService.findAllProductResult(), HttpStatus.OK);
+    @RananuBody
+    public List<?> showProducts() {
+        return productService.findAllProductResult();
+
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> findByIdProduct(@PathVariable("productId") String productIdStr) {
-        return new ResponseEntity<>(productService.findByIdAndDeletedFalse(productIdStr), HttpStatus.OK);
+    @RananuBody
+    public ProductResult getByIdProduct(@PathVariable("productId") Long productId) {
+        return productService.getByIdAndDeletedFalse(productId);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@ModelAttribute CreationProductParam creationProductParam, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            return appUtils.mapErrorToResponse(bindingResult);
-        }
-        return new ResponseEntity<>(productService.createProduct(creationProductParam), HttpStatus.CREATED);
+    @RananuBody(message = "validate.user.create.success")
+    public ProductResult createProduct(@Valid @ModelAttribute ProductParam productParam) {
+        return productService.createProduct(productParam);
     }
 
     @PatchMapping("/edit/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable("productId") String productIdStr, @ModelAttribute UpdateProductParam updateProductParam, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            return appUtils.mapErrorToResponse(bindingResult);
-        }
-        ProductResult dto = productService.update(productIdStr, updateProductParam);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+    @RananuBody(message = "validate.user.update.success")
+    public ProductResult updateProduct(@PathVariable("productId") Long productId,
+                                       @ModelAttribute ProductParam updateProductParam) {
+        return productService.update(productId, updateProductParam);
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("productId") String productIdStr) {
-        if (!validateUtils.isNumberValid(productIdStr)) {
-            throw new DataInputException("Mã sản phẩm không hợp lệ");
-        }
-        productService.findByIdAndDeletedFalse(productIdStr);
-        Long productId = Long.parseLong(productIdStr);
-
+    @RananuBody
+    public ResponseEntity<?> deleteProduct(@PathVariable("productId") Long productId) {
         productService.deleteById(productId);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
     @GetMapping("/search/{categoryId}")
-    public ResponseEntity<List<ProductResult>> getProductBycategory(@PathVariable("categoryId") String categoryIdStr) {
-
-        if (!validateUtils.isNumberValid(categoryIdStr)) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
-        Long categoryId = Long.parseLong(categoryIdStr);
-
-        if (!categoryService.existById(categoryId)) {
-            throw new RuntimeException("Category not found!");
-        }
-
-        List<ProductResult> productResult = productService.findAllByCategoryLike(categoryId);
-
-        return new ResponseEntity<>(productResult, HttpStatus.OK);
+    @RananuBody
+    public List<ProductResult> getProductByCategory(@PathVariable("categoryId") Long categoryId) {
+        return productService.findAllByCategoryLike(categoryId);
     }
 
     @GetMapping("/searchName/{keySearch}")
-    public ResponseEntity<List<ProductResult>> getProductByName(@PathVariable("keySearch") String keySearch) {
+    @RananuBody
+    public List<ProductResult> getProductByName(@PathVariable("keySearch") String keySearch) {
         keySearch = '%' + keySearch + '%';
-
-        List<ProductResult> productResult = productService.findProductByName(keySearch);
-        if (productResult.isEmpty()) {
-            throw new DataInputException("Sản phẩm này không tồn tại");
-        }
-        return new ResponseEntity<>(productResult, HttpStatus.OK);
+        return productService.getProductByName(keySearch);
     }
 
     @GetMapping("{/categoryId}/{keySearch}")
-    public ResponseEntity<List<ProductResult>> searchProductCategory(@PathVariable("keySearch") String keySearch, @PathVariable("categoryId") String categoryIdStr) {
-        if (!validateUtils.isNumberValid(categoryIdStr)) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
-        Long categoryId = Long.parseLong(categoryIdStr);
-        categoryService.findByIdAndDeletedFalse(categoryIdStr);
+    @RananuBody
+    public List<ProductResult> searchProductCategory(@PathVariable("keySearch") String keySearch, @PathVariable("categoryId") Long categoryId) {
+        categoryService.findByIdAndDeletedFalse(categoryId);
         keySearch = '%' + keySearch + '%';
-        List<ProductResult> productResult = productService.findAllByCategoryLikeAndAndTitleLike(categoryId, keySearch);
-        if (productResult.isEmpty()) {
-            throw new DataInputException("Sản phẩm này không tồn tại");
-        }
-        return new ResponseEntity<>(productResult, HttpStatus.OK);
+        return productService.getAllByCategoryLikeAndAndTitleLike(categoryId, keySearch);
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<ProductResult>> getAllProductDTO(@RequestParam("page") int page, @RequestParam("pageSize") int pageSize) {
-        try {
-            Page<ProductResult> productDTOS = productService.findAllProductDTOPage(PageRequest.of(page - 1, pageSize));
-
-            if (productDTOS.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            return new ResponseEntity<>(productDTOS, HttpStatus.OK);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    @RananuBody
+    public Page<ProductResult> getAllProductDTO(@RequestParam("page") int page, @RequestParam("pageSize") int pageSize) {
+        return productService.findAllProductDTOPage(PageRequest.of(page - 1, pageSize));
     }
 }

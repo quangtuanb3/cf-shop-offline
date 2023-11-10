@@ -2,13 +2,12 @@ package com.cg.category;
 
 
 import com.cg.category.dto.*;
-import com.cg.exception.DataInputException;
 import com.cg.model.Category;
 import com.cg.utils.ValidateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import vn.rananu.shared.exception.NotFoundException;
 import java.util.List;
 
 @Service
@@ -32,13 +31,12 @@ public class CategoryServiceImpl implements ICategoryService {
     @Transactional
     public CategoryResult updateCategory(String categoryStrId, UpdateCategoryParam updateCategoryParam) {
         if (!validateUtils.isNumberValid(categoryStrId)){
-            throw new DataInputException("Mã không hợp lệ");
+            throw new NotFoundException("product.exception.invalidCategory");
         }
 
         Long idCategory =Long.parseLong(categoryStrId);
-        categoryRepository.findByIdAndDeletedFalse(idCategory).orElseThrow(() ->{
-            throw new DataInputException("Mã không tồn tại");
-        });
+        categoryRepository.findByIdAndDeletedFalse(idCategory)
+                .orElseThrow(() -> new NotFoundException("product.exception.invalidCategory"));
         Category category = updateCategoryParam.toCategoryUpreqDTO(idCategory);
         categoryRepository.save(category);
         return categoryMapper.toDTO(category);
@@ -47,28 +45,18 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional
-    public void deleteByIdTrue(String strID) {
-        if (!validateUtils.isNumberValid(strID)) {
-            throw new DataInputException("Mã không hợp lệ");
-        }
-        Long categoryId = Long.parseLong(strID);
-        Category entity = categoryRepository.findByIdAndDeletedFalse(categoryId).orElseThrow(() -> {
-            throw new DataInputException("Mã không tồn tại ");
-        });
+    public void deleteByIdTrue(Long id) {
+        Category entity = categoryRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new NotFoundException("product.exception.invalidCategory"));
         entity.setDeleted(true);
         categoryRepository.save(entity);
     }
 
     @Override
     @Transactional
-    public CategoryResult findByIdAndDeletedFalse(String categoryIdStr) {
-        if (!validateUtils.isNumberValid(categoryIdStr)) {
-            throw new DataInputException("Mã danh mục không hợp lệ");
-        }
-        Long categoryId = Long.parseLong(categoryIdStr);
-        Category entity = categoryRepository.findByIdAndDeletedFalse(categoryId).orElseThrow(()->{
-            throw new DataInputException("Mã danh mục không tồn tại");
-        });
+    public CategoryResult findByIdAndDeletedFalse(Long categoryId) {
+        Category entity = categoryRepository.findByIdAndDeletedFalse(categoryId)
+                .orElseThrow(()-> new NotFoundException("product.exception.invalidCategory"));
         return categoryMapper.toDTO(entity);
     }
 

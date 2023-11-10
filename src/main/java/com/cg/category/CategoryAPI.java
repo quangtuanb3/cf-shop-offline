@@ -30,8 +30,8 @@ public class CategoryAPI {
         return new ResponseEntity<>(categoryService.findAll(),HttpStatus.OK);
     }
     @GetMapping("/{categoryId}")
-    public ResponseEntity<?> getById(@PathVariable("categoryId") String categoryIdStr){
-        return new ResponseEntity<>(categoryService.findByIdAndDeletedFalse(categoryIdStr),HttpStatus.OK);
+    public ResponseEntity<?> getById(@PathVariable("categoryId") Long id){
+        return new ResponseEntity<>(categoryService.findByIdAndDeletedFalse(id),HttpStatus.OK);
     }
 
     @PostMapping("/create")
@@ -55,10 +55,10 @@ public class CategoryAPI {
     }
 
     @PatchMapping("/delete/{categoryId}")
-    public ResponseEntity<?> deleteCategory(@PathVariable("categoryId") String categoryIdStr){
+    public ResponseEntity<?> deleteCategory(@PathVariable("categoryId") Long id){
 
 
-        categoryService.deleteByIdTrue(categoryIdStr);
+        categoryService.deleteByIdTrue(id);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }

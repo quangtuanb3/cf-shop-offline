@@ -29,10 +29,9 @@ public class UserAPI {
     }
 
     @PostMapping
-    @RananuBody(message = "tao user thanh cong")
+    @RananuBody(message = "validate.user.create.success")
     public UserResult create(UserParam creationParam) {
-        UserResult dto = userService.create(creationParam);
-        return dto;
+        return userService.create(creationParam);
     }
 
     @PatchMapping("/{id}")

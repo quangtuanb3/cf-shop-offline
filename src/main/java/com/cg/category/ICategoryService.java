@@ -9,13 +9,11 @@ public interface ICategoryService  {
 
         CategoryResult createCategory(CreationCategoryParam creationCategoryParam);
 
-
-
         CategoryResult updateCategory(String categoryStrId, UpdateCategoryParam updateCategoryParam);
 
-        void deleteByIdTrue(String strID);
+        void deleteByIdTrue(Long id);
 
-        CategoryResult findByIdAndDeletedFalse(String id);
+        CategoryResult findByIdAndDeletedFalse(Long id);
 
         List<CategoryResult> findAll();
 }
