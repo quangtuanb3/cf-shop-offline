@@ -44,9 +44,6 @@ public class Product extends BaseEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "product")
-    private List<OrderDetail> orderDetails;
-
     @OneToOne
     @JoinColumn(name = "product_avatar_id",foreignKey = @ForeignKey(name = "fk_product_productAvatar"), referencedColumnName = "id", nullable = false)
     private ProductAvatar productAvatar;

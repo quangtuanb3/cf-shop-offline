@@ -5,6 +5,8 @@ import com.cg.user.dto.UserResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.rananu.shared.Result;
+import vn.rananu.shared.annotation.RananuBody;
 
 import java.util.List;
 
@@ -15,21 +17,22 @@ public class UserAPI {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<?> findAll(String username) {
-        List<UserResult> dtoList = userService.findAll();
-        return ResponseEntity.ok(dtoList);
+    @RananuBody
+    public List<?> findAll(String username) {
+        return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(Long id) {
-        UserResult dto = userService.getById(id);
-        return ResponseEntity.ok(dto);
+    @RananuBody
+    public UserResult findById(Long id) {
+        return userService.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> create(UserParam creationParam) {
+    @RananuBody(message = "tao user thanh cong")
+    public UserResult create(UserParam creationParam) {
         UserResult dto = userService.create(creationParam);
-        return ResponseEntity.ok(dto);
+        return dto;
     }
 
     @PatchMapping("/{id}")
