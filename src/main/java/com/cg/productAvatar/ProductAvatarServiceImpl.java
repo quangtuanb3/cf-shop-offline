@@ -1,6 +1,5 @@
 package com.cg.productAvatar;
 
-import com.cg.exception.ResourceNotFoundException;
 import com.cg.model.ProductAvatar;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

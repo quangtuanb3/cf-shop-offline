@@ -2,6 +2,7 @@ package com.cg.model;
 
 import com.cg.model.user.UserRole;
 import com.cg.model.user.User;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 

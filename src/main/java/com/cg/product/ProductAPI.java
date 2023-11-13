@@ -6,7 +6,6 @@ import com.cg.utils.AppUtils;
 import com.cg.utils.ValidateUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.grammars.hql.HqlParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import vn.rananu.shared.annotation.RananuBody;
 
 import java.util.List;
 
-//@RestController
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/products")
