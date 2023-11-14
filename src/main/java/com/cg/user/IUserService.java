@@ -17,4 +17,8 @@ public interface IUserService{
     UserResult create(UserParam creationParam);
 
     UserResult update(Long id, UserParam userParam);
+
+    Boolean existsByUsername(String username);
+
+    User getByUsername(String username);
 }

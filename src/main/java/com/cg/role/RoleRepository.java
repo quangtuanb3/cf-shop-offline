@@ -1,9 +1,0 @@
-package com.cg.role;
-
-import com.cg.model.Role;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface RoleRepository extends JpaRepository<Role,Long> {
-}

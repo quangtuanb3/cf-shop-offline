@@ -1,17 +1,14 @@
 package com.cg.security;
 
-import com.cg.exception.DataInputException;
-import com.cg.exception.EmailExistsException;
 import com.cg.model.JwtResponse;
-import com.cg.model.Role;
 import com.cg.model.user.User;
 import com.cg.model.user.UserRole;
 import com.cg.service.jwt.JwtService;
-import com.cg.role.IRoleService;
 import com.cg.user.IUserService;
 import com.cg.user.UserMapper;
 import com.cg.user.dto.UserParam;
 import com.cg.utils.AppUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,8 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import vn.rananu.shared.exception.OperationException;
 
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,18 +51,17 @@ public class AuthAPI {
         Boolean existsByUsername = userService.existsByUsername(userParam.getUsername());
 
         if (existsByUsername) {
-            throw new EmailExistsException("Account already exists");
+            throw new OperationException("validate.user.email.existed");
         }
-
 
         User entity = userMapper.toEntity(userParam);
         entity.setRole(UserRole.ROLE_STAFF);
         try {
-            userService.save(entity);
+            userService.create(userParam);
             return new ResponseEntity<>(HttpStatus.CREATED);
 
         } catch (DataIntegrityViolationException e) {
-            throw new DataInputException("Account information is not valid, please check the information again");
+            throw new OperationException("Account information is not valid, please check the information again");
         }
     }
 

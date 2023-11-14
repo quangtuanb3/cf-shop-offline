@@ -15,7 +15,7 @@ public class SecurityService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username);
+        User user = userService.getByUsername(username);
                      // You may need to convert your User entity to a UserDetails object based on your User class implementation
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())

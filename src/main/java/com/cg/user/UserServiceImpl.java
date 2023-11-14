@@ -53,4 +53,15 @@ public class UserServiceImpl implements IUserService {
         userMapper.transferFields(entity, userParam);
         return userMapper.toDTO(entity);
     }
+
+    @Override
+    public Boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() ->
+         new NotFoundException("product.exception.notFound"));
+    }
 }

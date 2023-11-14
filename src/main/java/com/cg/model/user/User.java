@@ -1,12 +1,10 @@
 package com.cg.model.user;
 
 import com.cg.model.BaseEntity;
-import com.cg.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
 
 
 @Getter
@@ -14,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table le(name = "users")
+@Table (name = "users")
 @Accessors(chain = true)
 public class User extends BaseEntity {
 
